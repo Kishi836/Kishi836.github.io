@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kshitij Shettigar · Systems Software</title>
+<meta name="description" content="Kshitij G Shettigar. CS undergrad at PES University building a Rust process-migration VM, a zero-knowledge password manager, and FHIR health-data tooling.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230c1013'/%3E%3Ctext x='16' y='23' font-family='monospace' font-size='20' fill='%2346c68c' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+<style>
+@font-face { font-family: "Geist"; src: url("fonts/geist-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Geist"; src: url("fonts/geist-500.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+@font-face { font-family: "Geist"; src: url("fonts/geist-700.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "JBMono"; src: url("fonts/jbmono-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "JBMono"; src: url("fonts/jbmono-500.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+
+:root {
+  --bg: #0c1013;
+  --bg-raised: #10151a;
+  --line: rgba(255,255,255,.09);
+  --text: #e8ecef;
+  --muted: #96a2ab;
+  --accent: #46c68c;
+  --accent-ink: #08130d;
+  --sans: "Geist", system-ui, -apple-system, sans-serif;
+  --mono: "JBMono", ui-monospace, "Cascadia Mono", monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: var(--accent); color: var(--accent-ink); }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.wrap { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+
+/* ---------- nav ---------- */
+header {
+  position: sticky; top: 0; z-index: 10;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.nav {
+  height: 64px; display: flex; align-items: center; justify-content: space-between;
+}
+.nav .mark { font-family: var(--mono); font-size: 14px; letter-spacing: -.02em; text-decoration: none; color: var(--text); }
+.nav .mark b { color: var(--accent); font-weight: 500; }
+.nav ul { display: flex; gap: 28px; list-style: none; align-items: center; }
+.nav ul a { font-size: 14px; color: var(--muted); text-decoration: none; transition: color .2s; }
+.nav ul a:hover { color: var(--text); }
+.nav ul a.gh { color: var(--text); font-family: var(--mono); font-size: 13px; }
+.nav ul a.gh:hover { color: var(--accent); }
+
+/* ---------- hero ---------- */
+.hero { min-height: calc(100dvh - 64px); display: grid; grid-template-columns: 6fr 5fr; gap: 64px; align-items: center; padding: 48px 0 64px; }
+.hero h1 {
+  font-size: clamp(2.2rem, 4.6vw, 3.6rem);
+  font-weight: 700; letter-spacing: -.035em; line-height: 1.06;
+  max-width: 14ch;
+}
+.hero h1 em { font-style: italic; color: var(--accent); line-height: 1.1; }
+.hero .sub { margin-top: 22px; color: var(--muted); font-size: 17px; max-width: 46ch; }
+.hero .cta { margin-top: 36px; display: flex; gap: 14px; flex-wrap: wrap; }
+.btn {
+  display: inline-block; padding: 13px 26px; font-size: 15px; font-weight: 500;
+  text-decoration: none; border: 1px solid transparent;
+  transition: transform .15s, background .2s, border-color .2s;
+}
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-primary:hover { background: #58d49b; }
+.btn-ghost { border-color: var(--line); color: var(--text); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+.code {
+  border: 1px solid var(--line); background: var(--bg-raised);
+  font-family: var(--mono); font-size: 13px; line-height: 1.75;
+  padding: 22px 26px; overflow-x: auto;
+}
+.code .path { color: var(--muted); font-size: 11.5px; display: block; margin-bottom: 14px; }
+.code pre { font-family: inherit; }
+.code .k { color: var(--accent); }
+.code .c { color: #5d6a73; }
+.code .t { color: #c9d4dc; }
+
+/* ---------- sections ---------- */
+section { padding: 96px 0; border-top: 1px solid var(--line); }
+.eyebrow { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .18em; color: var(--accent); margin-bottom: 14px; }
+h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; letter-spacing: -.03em; margin-bottom: 48px; }
+
+/* featured: parakaya full row */
+.feature { display: grid; grid-template-columns: 5fr 7fr; gap: 56px; padding: 40px 0; }
+.feature h3 { font-size: clamp(1.7rem, 3.4vw, 2.6rem); font-weight: 700; letter-spacing: -.03em; line-height: 1.1; }
+.feature h3 a { text-decoration: none; transition: color .2s; }
+.feature h3 a:hover { color: var(--accent); }
+.feature .role { font-family: var(--mono); font-size: 12.5px; color: var(--muted); margin-top: 10px; }
+.feature p { color: var(--muted); max-width: 60ch; }
+.feature p + p { margin-top: 14px; }
+.feature .tags { margin-top: 22px; display: flex; gap: 10px; flex-wrap: wrap; }
+.tag { font-family: var(--mono); font-size: 12px; color: var(--text); border: 1px solid var(--line); padding: 5px 10px; }
+.repo-link { display: inline-block; margin-top: 24px; font-family: var(--mono); font-size: 13.5px; color: var(--accent); text-decoration: none; }
+.repo-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+/* featured: pair grid */
+.pair { display: grid; grid-template-columns: 3fr 2fr; gap: 56px; margin-top: 40px; padding-top: 56px; border-top: 1px solid var(--line); }
+.pair article h3 { font-size: 1.35rem; font-weight: 700; letter-spacing: -.02em; }
+.pair article h3 a { text-decoration: none; }
+.pair article h3 a:hover { color: var(--accent); }
+.pair article p { color: var(--muted); margin-top: 12px; font-size: 15.5px; }
+.pair .tags { margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* more work */
+.more-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px 64px; }
+.more-grid a {
+  text-decoration: none; display: block; padding-bottom: 20px;
+  border-bottom: 1px solid var(--line); transition: border-color .2s;
+}
+.more-grid a:hover { border-color: var(--accent); }
+.more-grid .name { font-family: var(--mono); font-size: 14.5px; font-weight: 500; }
+.more-grid a:hover .name { color: var(--accent); }
+.more-grid .desc { color: var(--muted); font-size: 14.5px; margin-top: 6px; }
+.all-repos { display: inline-block; margin-top: 40px; font-family: var(--mono); font-size: 13.5px; color: var(--accent); text-decoration: none; }
+.all-repos:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+/* about */
+.about { display: grid; grid-template-columns: 5fr 6fr; gap: 72px; }
+.about .bio p { color: var(--muted); }
+.about .bio p + p { margin-top: 16px; }
+.skills { display: grid; grid-template-columns: 1fr 1fr; gap: 36px 48px; }
+.skills h4 { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .14em; color: var(--muted); font-weight: 500; margin-bottom: 12px; }
+.skills ul { list-style: none; }
+.skills li { font-size: 15px; padding: 3px 0; }
+
+/* milestones */
+.timeline { display: grid; gap: 26px; max-width: 720px; }
+.trow { display: grid; grid-template-columns: 88px 1fr; gap: 20px; align-items: baseline; }
+.trow .year { font-family: var(--mono); font-size: 13.5px; color: var(--accent); }
+.trow span:last-child { color: var(--muted); }
+
+/* contact */
+.contact h2 { margin-bottom: 20px; }
+.contact p { color: var(--muted); max-width: 50ch; margin-bottom: 36px; }
+.contact .links { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+.contact .alt { font-family: var(--mono); font-size: 13.5px; color: var(--muted); text-decoration: none; padding: 13px 6px; }
+.contact .alt:hover { color: var(--accent); }
+
+footer { border-top: 1px solid var(--line); padding: 28px 0; }
+footer .wrap { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+
+/* reveal motion */
+.reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1); }
+.reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* mobile */
+@media (max-width: 860px) {
+  .hero { grid-template-columns: 1fr; gap: 48px; min-height: 0; padding: 64px 0; }
+  .feature, .pair, .about { grid-template-columns: 1fr; gap: 32px; }
+  .more-grid { grid-template-columns: 1fr; }
+  .skills { grid-template-columns: 1fr 1fr; }
+  section { padding: 72px 0; }
+  .nav ul { gap: 18px; }
+  .nav ul li.hide-sm { display: none; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="mark" href="#">kshitij<b>@</b>shettigar</a>
+    <nav>
+      <ul>
+        <li class="hide-sm"><a href="#work">Work</a></li>
+        <li class="hide-sm"><a href="#about">About</a></li>
+        <li class="hide-sm"><a href="#contact">Contact</a></li>
+        <li><a class="gh" href="https://github.com/Kishi836" target="_blank" rel="noopener">github/Kishi836</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="hero">
+      <div>
+        <h1>Systems software, from VM internals to <em>vault crypto</em>.</h1>
+        <p class="sub">Third-year CS undergrad at PES University, Bangalore. Currently building Parakaya, a Rust VM that migrates live processes between machines.</p>
+        <div class="cta">
+          <a class="btn btn-primary" href="#work">View work</a>
+          <a class="btn btn-ghost" href="resume.pdf" target="_blank" rel="noopener">Resume PDF</a>
+        </div>
+      </div>
+      <div class="code reveal">
+        <span class="path">parakaya/crates/parakaya-vm/src/instr.rs</span>
+        <pre><span class="k">pub enum</span> <span class="t">Instr</span> {
+    I32Const(<span class="k">i32</span>),
+    I32Add, I32Sub, I32Mul, I32DivS,
+    LocalGet(<span class="k">u32</span>), LocalSet(<span class="k">u32</span>),
+    Block, Loop, If, Else,
+    Br(<span class="k">u32</span>), BrIf(<span class="k">u32</span>), Return, Call(<span class="k">u32</span>),
+    I32Load(<span class="t">MemArg</span>), I32Store(<span class="t">MemArg</span>),
+    End,
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <section id="work">
+    <div class="wrap">
+      <p class="eyebrow">Selected work</p>
+      <h2>Three projects, three layers of the stack.</h2>
+
+      <div class="feature reveal">
+        <div>
+          <h3><a href="https://github.com/Kishi836/parakaya" target="_blank" rel="noopener">Parakaya</a></h3>
+          <p class="role">Rust, custom instruction set, in active development</p>
+        </div>
+        <div>
+          <p>A running program hops between a PC, a Raspberry Pi, a phone, and a cloud VM mid-execution, across CPU architectures, surviving power loss at any instant.</p>
+          <p>The VM core is a Rust workspace: a compact instruction set, tagged values, and execution state built to checkpoint on one architecture and resume on another. Designed spec-first, with decision records for every architectural call.</p>
+          <div class="tags"><span class="tag">Rust</span><span class="tag">process VM</span><span class="tag">checkpoint / resume</span></div>
+          <a class="repo-link" href="https://github.com/Kishi836/parakaya" target="_blank" rel="noopener">github.com/Kishi836/parakaya</a>
+        </div>
+      </div>
+
+      <div class="pair">
+        <article class="reveal">
+          <h3><a href="https://github.com/Kishi836/passgen" target="_blank" rel="noopener">PassGen Vault</a></h3>
+          <p>A zero-knowledge password manager. One AES-256-GCM vault in OneDrive, opened by a single-file web app and a native Android client. PBKDF2 at 600,000 iterations, fingerprint unlock backed by hardware keys, and a generator built on a CSPRNG with rejection sampling so there is no modulo bias.</p>
+          <div class="tags"><span class="tag">JavaScript</span><span class="tag">Android</span><span class="tag">Web Crypto</span><span class="tag">MS Graph</span></div>
+          <a class="repo-link" href="https://github.com/Kishi836/passgen" target="_blank" rel="noopener">github.com/Kishi836/passgen</a>
+        </article>
+        <article class="reveal">
+          <h3><a href="https://github.com/Kishi836/project3-fhir-resource-modelling" target="_blank" rel="noopener">Clinical Timeline Builder</a></h3>
+          <p>Twenty hand-authored FHIR R4 resources modelling a diabetic care pathway, validated against a HAPI server and rebuilt into a chronological clinical timeline with Python. Coded with LOINC, ICD-10 and RxNorm.</p>
+          <div class="tags"><span class="tag">Python</span><span class="tag">FHIR R4</span><span class="tag">HAPI</span></div>
+          <a class="repo-link" href="https://github.com/Kishi836/project3-fhir-resource-modelling" target="_blank" rel="noopener">github.com/Kishi836/project3-fhir…</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>More on GitHub</h2>
+      <div class="more-grid">
+        <a class="reveal" href="https://github.com/Kishi836/network-traffic-classifier-cn" target="_blank" rel="noopener">
+          <div class="name">network-traffic-classifier</div>
+          <div class="desc">Traffic classification on Linux with Wireshark, POX and Mininet.</div>
+        </a>
+        <a class="reveal" href="https://github.com/Kishi836/meditech-lab-dashboard" target="_blank" rel="noopener">
+          <div class="name">meditech-lab-dashboard</div>
+          <div class="desc">Flask medical-informatics dashboard with an HL7 pipeline over PostgreSQL.</div>
+        </a>
+        <a class="reveal" href="https://github.com/Kishi836/secure-remote-command-execution" target="_blank" rel="noopener">
+          <div class="name">secure-remote-command-execution</div>
+          <div class="desc">Remote command execution over SSL/TLS sockets.</div>
+        </a>
+        <a class="reveal" href="https://github.com/Kishi836/vulnerable-demo-app" target="_blank" rel="noopener">
+          <div class="name">vulnerable-demo-app</div>
+          <div class="desc">Deliberately vulnerable app for demonstrating OSV and NVD scanning.</div>
+        </a>
+      </div>
+      <a class="all-repos" href="https://github.com/Kishi836?tab=repositories" target="_blank" rel="noopener">All repositories</a>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="wrap about">
+      <div class="bio reveal">
+        <h2>About</h2>
+        <p>I got into computers through robotics: FIRST LEGO League, then representing India at the 2019 International Championship in Sydney. These days the obsession is lower level. I am an Arch Linux and Hyprland person, and I like problems where the OS, the hardware and the network all have opinions.</p>
+        <p>At PES University I study CS with a minor in medical technology, which is where the FHIR work comes from. This semester I picked the two electives closest to the metal: AR/VR (OpenGL, Unity, Three.js) and ROS for Autonomous Systems (ROS 2 Humble, Gazebo, Webots).</p>
+        <p>Outside of code: keyboard, music production and cycling.</p>
+      </div>
+      <div class="skills reveal">
+        <div>
+          <h4>Languages</h4>
+          <ul><li>Python, C, C++</li><li>Rust</li><li>Java, JavaScript</li></ul>
+        </div>
+        <div>
+          <h4>Systems &amp; Robotics</h4>
+          <ul><li>Linux (Arch, Hyprland)</li><li>ROS 2, Gazebo, Webots</li><li>Arduino, Raspberry Pi</li></ul>
+        </div>
+        <div>
+          <h4>Security</h4>
+          <ul><li>Web Crypto, AES-GCM</li><li>Wireshark</li><li>Bandit, njsscan, OSV</li></ul>
+        </div>
+        <div>
+          <h4>Web</h4>
+          <ul><li>React, Node, Express</li><li>Flask, REST APIs</li><li>MongoDB, SQLite</li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Milestones</h2>
+      <div class="timeline">
+        <div class="trow reveal"><span class="year">2026</span><span>Built a heart-disease prediction model at the Epoch Datathon.</span></div>
+        <div class="trow reveal"><span class="year">2022</span><span>Ranked 5th in school, CBSE Class 10 board examinations.</span></div>
+        <div class="trow reveal"><span class="year">2019</span><span>Represented India at the FIRST LEGO League International Championship in Sydney.</span></div>
+        <div class="trow reveal"><span class="year">2019</span><span>1st place and Best Project Award, FIRST LEGO League Regional.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="contact">
+    <div class="wrap reveal">
+      <h2>Open to internships and collaboration.</h2>
+      <p>If you are working on systems, security or health-tech and want an engineer who reads the spec first, get in touch.</p>
+      <div class="links">
+        <a class="btn btn-primary" href="mailto:gskshitij0638@gmail.com">gskshitij0638@gmail.com</a>
+        <a class="alt" href="https://www.linkedin.com/in/kshitij-shettigar-53a220318" target="_blank" rel="noopener">LinkedIn</a>
+        <a class="alt" href="https://github.com/Kishi836" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Kshitij G Shettigar, 2026</span>
+    <span>Bangalore, India</span>
+  </div>
+</footer>
+
+<script>
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+if (reduce) {
+  document.querySelectorAll(".reveal").forEach(el => el.classList.add("in"));
+} else {
+  const io = new IntersectionObserver(entries => {
+    for (const e of entries) if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+  }, { threshold: 0.18 });
+  document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+}
+</script>
+
+</body>
+</html>
