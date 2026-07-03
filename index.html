@@ -120,6 +120,19 @@ h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; letter-spacing: -.
 .pair article p { color: var(--muted); margin-top: 12px; font-size: 15.5px; }
 .pair .tags { margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; }
 
+/* repo6uard callout */
+.callout {
+  margin-top: 56px; border: 1px solid var(--line); background: var(--bg-raised);
+  padding: 44px; display: grid; grid-template-columns: 2fr 3fr; gap: 56px;
+}
+.callout h3 { font-size: 1.5rem; font-weight: 700; letter-spacing: -.02em; }
+.callout h3 a { text-decoration: none; }
+.callout h3 a:hover { color: var(--accent); }
+.callout .role { font-family: var(--mono); font-size: 12.5px; color: var(--muted); margin-top: 10px; }
+.callout p { color: var(--muted); font-size: 15.5px; }
+.callout p + p { margin-top: 14px; }
+.callout .tags { margin-top: 22px; display: flex; gap: 10px; flex-wrap: wrap; }
+
 /* more work */
 .more-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px 64px; }
 .more-grid a {
@@ -168,7 +181,8 @@ footer .wrap { display: flex; justify-content: space-between; font-family: var(-
 /* mobile */
 @media (max-width: 860px) {
   .hero { grid-template-columns: 1fr; gap: 48px; min-height: 0; padding: 64px 0; }
-  .feature, .pair, .about { grid-template-columns: 1fr; gap: 32px; }
+  .feature, .pair, .about, .callout { grid-template-columns: 1fr; gap: 32px; }
+  .callout { padding: 28px; }
   .more-grid { grid-template-columns: 1fr; }
   .skills { grid-template-columns: 1fr 1fr; }
   section { padding: 72px 0; }
@@ -222,7 +236,7 @@ footer .wrap { display: flex; justify-content: space-between; font-family: var(-
   <section id="work">
     <div class="wrap">
       <p class="eyebrow">Selected work</p>
-      <h2>Three projects, three layers of the stack.</h2>
+      <h2>Four projects, four different problems.</h2>
 
       <div class="feature reveal">
         <div>
@@ -250,6 +264,19 @@ footer .wrap { display: flex; justify-content: space-between; font-family: var(-
           <div class="tags"><span class="tag">Python</span><span class="tag">FHIR R4</span><span class="tag">HAPI</span></div>
           <a class="repo-link" href="https://github.com/Kishi836/project3-fhir-resource-modelling" target="_blank" rel="noopener">github.com/Kishi836/project3-fhir…</a>
         </article>
+      </div>
+
+      <div class="callout reveal">
+        <div>
+          <h3><a href="https://github.com/Kishi836/repo6uard" target="_blank" rel="noopener">Repo6uard</a></h3>
+          <p class="role">Team of six, CIE Ignite startup program at PES</p>
+          <div class="tags"><span class="tag">Python / Flask</span><span class="tag">React</span><span class="tag">Bandit + njsscan</span><span class="tag">LLM</span><span class="tag">OSV / NVD</span></div>
+        </div>
+        <div>
+          <p>A hybrid vulnerability scanner: static analysis finds known patterns, an LLM reasoning pass validates them in context and writes fix suggestions, and dependencies get cross-checked against Google's OSV and the NVD. The working prototype scanned a deliberately vulnerable repo and reported 15 issues across 8 OWASP categories in under 30 seconds.</p>
+          <p>We pitched it through two phases of the campus startup program and missed the final round by one position. The scanner still works.</p>
+          <a class="repo-link" href="https://github.com/Kishi836/repo6uard" target="_blank" rel="noopener">github.com/Kishi836/repo6uard</a>
+        </div>
       </div>
     </div>
   </section>
