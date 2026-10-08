@@ -27,7 +27,7 @@ atexit.register(shutil.rmtree, TMP, True)
 
 # [hash to load, iframe width, hash to switch to after load]
 CASES = [[f"#/{v}", 375, None] for v in VIEWS] + [
-    ["", 375, None], ["#work", 375, None], ["#/nope", 375, None], ["#/work/x", 375, None],
+    ["", 375, None], ["#work", 375, None], ["#/nope", 375, None], ["#/work/x", 375, None], ["#/work/passgen", 375, None],
     ["#/home", 1440, None], ["#/home", 1440, "#/about"],
 ]
 
@@ -45,7 +45,9 @@ cases.forEach(([frag, w, next], i) => {
         shown: [...d.querySelectorAll("[data-view]")].filter(s => !s.hidden).map(s => s.dataset.view),
         current: [...d.querySelectorAll("[aria-current=page]")].map(a => a.getAttribute("href")),
         sw: d.documentElement.scrollWidth, sy: f.contentWindow.scrollY, heroPad: parseFloat(f.contentWindow.getComputedStyle(d.querySelector(".hero")).paddingTop), cls: d.documentElement.className, focus: d.activeElement.id,
-        route: txt("route"), clock: txt("clock"), nodes: txt("m-nodes"), mig: txt("m-mig"),
+        route: txt("route"), clock: txt("clock"), nodes: txt("m-nodes"),
+        opened: [...d.querySelectorAll("details[open]")].map(e => e.id),
+        marquee: f.contentWindow.getComputedStyle(d.querySelector(".marquee-track")).animationName,
       };
       if (rows.filter(Boolean).length === cases.length) document.body.dataset.out = JSON.stringify(rows);
     }, 400);
@@ -64,14 +66,16 @@ def chrome(url, *flags, size="1440,900"):
             capture_output=True, text=True, encoding="utf-8", timeout=120).stdout
 
 
-# Chrome's JS-off switches either still run scripts or kill --dump-dom, so "no JS" = the page with its scripts cut out.
-NOJS = """<!doctype html><body><iframe id="f" src="nojs.html" width="1440" height="800"></iframe><script>
+# Loads a variant of the page and reports which views show and how many .reveal blocks in them are still faded.
+VARIANT = """<!doctype html><body><iframe id="f" src="%s" width="1440" height="800"></iframe><script>
 f.onload = () => {
-  const d = f.contentDocument, reveal = [...d.querySelectorAll(".reveal")];
-  document.body.dataset.out = JSON.stringify({
-    shown: [...d.querySelectorAll("[data-view]")].filter(s => getComputedStyle(s).display !== "none").map(s => s.dataset.view),
-    faded: reveal.filter(e => getComputedStyle(e).opacity !== "1").length,
-  });
+  setTimeout(() => {
+    const d = f.contentDocument, shown = [...d.querySelectorAll("[data-view]")].filter(s => getComputedStyle(s).display !== "none");
+    document.body.dataset.out = JSON.stringify({
+      shown: shown.map(s => s.dataset.view),
+      faded: shown.flatMap(s => [...s.querySelectorAll(".reveal")]).filter(e => getComputedStyle(e).opacity !== "1").length,
+    });
+  }, 1500);
 };
 </script></body>"""
 
@@ -88,9 +92,14 @@ def probe(*flags):
     return run_probe(PROBE % (json.dumps(CASES), json.dumps(URL)), *flags)
 
 
+def variant(src, frag="", *flags):
+    (TMP / "variant.html").write_text(src, encoding="utf-8")
+    return run_probe(VARIANT % ("variant.html" + frag), *flags)
+
+
 def nojs(src):
-    (TMP / "nojs.html").write_text(re.sub(r"<script>.*?</script>", "", src, flags=re.S), encoding="utf-8")
-    return run_probe(NOJS)
+    """Chrome's JS-off switches either still run scripts or kill --dump-dom, so "no JS" = the page with its scripts cut out."""
+    return variant(re.sub(r"<script>.*?</script>", "", src, flags=re.S))
 
 
 def views_in(markup):
@@ -110,7 +119,7 @@ for name in VIEWS[1:]:
     assert f'href="#/{name}"' in SRC, f"nothing links to #/{name}"
 for s in ["600k", "&lt;30s", "FLL International", "mailto:gskshitij0638@gmail.com",
           "linkedin.com/in/kshitijgshettigar", "resume.pdf", "github.com/Kishi836/parakaya",
-          "github.com/Kishi836/repo6uard", "touch-action: pan-y", ".js .reveal"]:
+          "github.com/Kishi836/repo6uard", "touch-action: pan-y pinch-zoom", ".js .reveal"]:
     assert s in SRC, f"missing {s!r}"
 assert not re.search(r"^\.reveal\s*\{[^}]*opacity:\s*0", SRC, re.M), ".reveal hides content without JS"
 print("static ok")
@@ -121,6 +130,13 @@ assert bare["shown"] == VIEWS, f"no-JS visible views: {bare['shown']}"
 assert bare["faded"] == 0, f"no-JS: {bare['faded']} .reveal blocks stuck below full opacity"
 print("no-js ok")
 
+# ---- the mesh crashing (e.g. no ResizeObserver, iOS < 13.4) must not take routing or content down with it
+broken = variant(SRC.replace("<head>", "<head><script>delete window.ResizeObserver</script>", 1), "#/about",
+                 "--force-prefers-reduced-motion")
+assert broken["shown"] == ["about"], f"mesh crash broke routing: shown {broken['shown']}"
+assert broken["faded"] == 0, f"mesh crash left {broken['faded']} .reveal blocks invisible"
+print("crash ok")
+
 # ---- routing, aria-current, focus, 375px overflow
 rows = probe()
 for (frag, w, nxt), r in zip(CASES, rows):
@@ -130,7 +146,10 @@ for (frag, w, nxt), r in zip(CASES, rows):
     assert r["shown"] == [want], f"{label}: shown {r['shown']}"
     assert r["current"] == ([] if want == "home" else [f"#/{want}"]), f"{label}: aria-current {r['current']}"
     assert r["sw"] <= w, f"{label}: page is {r['sw']}px wide, horizontal scroll"
-    assert r["sy"] == 0, f"{label}: opened scrolled {r['sy']}px down, header covers the top"
+    if frag == "#/work/passgen":
+        assert "case-passgen" in r["opened"] and r["sy"] > 0, f"{label}: PassGen case not opened/scrolled to: {r['opened']}, y={r['sy']}"
+    else:
+        assert r["sy"] == 0, f"{label}: opened scrolled {r['sy']}px down, header covers the top"
     assert r["heroPad"] >= 40, f"{label}: hero top padding {r['heroPad']}px, name jammed under the header"
     if nxt:
         assert r["focus"] == f"h-{want}", f"{label}: focus on {r['focus']!r}"
@@ -152,7 +171,10 @@ desk = [r for (frag, w, nxt), r in zip(CASES, rows) if w == 1440 and not nxt][0]
 phone = rows[0]
 assert desk["nodes"] == "112", f"desktop mesh nodes {desk['nodes']!r}, want 4 x 28"
 assert phone["nodes"] == "64", f"375px mesh nodes {phone['nodes']!r}, want 4 x 16"
-assert all(r["mig"] == "0" for r in calm), "mesh animated under reduced motion"
+# Headless Chrome doesn't advance requestAnimationFrame here, so the mesh's own reduced-motion gate is checked by eye;
+# the marquee is pure CSS and can be checked.
+assert rows[0]["marquee"] == "marquee", f"marquee not animating: {rows[0]['marquee']!r}"
+assert all(r["marquee"] == "none" for r in calm), "marquee still moves under reduced motion"
 print("mesh ok")
 
 if "--shots" in sys.argv:

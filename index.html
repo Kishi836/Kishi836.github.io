@@ -122,7 +122,7 @@ h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; letter-spacing: -.
 
 .stage { position: absolute; inset: 0 0 0 38%; }
 html:not(.js) .stage { display: none; }
-#mesh { display: block; width: 100%; height: 100%; cursor: grab; touch-action: pan-y; }
+#mesh { display: block; width: 100%; height: 100%; cursor: grab; touch-action: pan-y pinch-zoom; }
 #mesh:active { cursor: grabbing; }
 .mesh-hud { position: absolute; top: 28px; left: 0; display: flex; gap: 20px; font-family: var(--mono); font-size: 11px; letter-spacing: .14em; color: var(--muted); }
 .mesh-hud b { color: var(--accent); font-weight: 500; }
@@ -182,7 +182,7 @@ html:not(.js) .stage { display: none; }
 .view:not(:first-child) { padding-bottom: 96px; }
 
 /* work: case studies */
-.case { border-top: 1px solid var(--line); }
+.case { border-top: 1px solid var(--line); scroll-margin-top: 64px; }
 .case:last-of-type { border-bottom: 1px solid var(--line); }
 .case summary {
   list-style: none; cursor: pointer; padding: 32px 0;
@@ -379,18 +379,18 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; font-fa
       <div class="wrap">
         <h2>Selected work</h2>
         <div class="featured">
-          <a class="tile big reveal" href="#/work">
+          <a class="tile big reveal" href="#/work/parakaya">
             <h3>Parakaya</h3>
             <p>A running program hops between a PC, a Raspberry Pi, a phone, and a cloud VM mid-execution, across CPU architectures, surviving power loss at any instant.</p>
             <div class="tags"><span class="tag">Rust</span><span class="tag">process VM</span><span class="tag">checkpoint / resume</span></div>
             <span class="go">Case study</span>
           </a>
-          <a class="tile reveal" href="#/work">
+          <a class="tile reveal" href="#/work/passgen">
             <h3>PassGen Vault</h3>
             <p>A zero-knowledge password manager: one AES-256-GCM vault, opened by a web app and a native Android client.</p>
             <div class="tags"><span class="tag">Web Crypto</span><span class="tag">Android</span></div>
           </a>
-          <a class="tile reveal" href="#/work">
+          <a class="tile reveal" href="#/work/timeline">
             <h3>Clinical Timeline Builder</h3>
             <p>Twenty FHIR R4 resources for a diabetic care pathway, rebuilt into a chronological clinical timeline.</p>
             <div class="tags"><span class="tag">Python</span><span class="tag">FHIR R4</span></div>
@@ -423,7 +423,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; font-fa
         <h1 id="h-work" tabindex="-1">Four projects, four different problems.</h1>
       </div>
 
-      <details class="case" open>
+      <details class="case" id="case-parakaya" open>
         <summary>
           <h2>Parakaya</h2>
           <span class="role">Rust, custom instruction set, in active development</span>
@@ -452,7 +452,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; font-fa
         </div>
       </details>
 
-      <details class="case">
+      <details class="case" id="case-passgen">
         <summary>
           <h2>PassGen Vault</h2>
           <span class="role">Single-file web app and native Android client</span>
@@ -469,7 +469,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; font-fa
         </div>
       </details>
 
-      <details class="case">
+      <details class="case" id="case-timeline">
         <summary>
           <h2>Clinical Timeline Builder</h2>
           <span class="role">Medical Innovations and Technology minor, PES University</span>
@@ -486,7 +486,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; font-fa
         </div>
       </details>
 
-      <details class="case">
+      <details class="case" id="case-repo6uard">
         <summary>
           <h2>Repo6uard</h2>
           <span class="role">Team of six, CIE Ignite startup program at PES</span>
@@ -607,7 +607,9 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; font-fa
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // ---------- Parakaya mesh: four machines passing process snapshots ----------
-const mesh = (() => {
+// It is decoration: if it throws (old browser, no ResizeObserver), the router and content below must still run.
+let mesh = { setActive() {} };
+try { mesh = (() => {
   const cv = document.getElementById("mesh");
   const ctx = cv.getContext("2d");
   const PER = matchMedia("(max-width: 860px)").matches ? 16 : 28;
@@ -757,7 +759,7 @@ const mesh = (() => {
   cv.addEventListener("pointercancel", release);
 
   return { setActive(on) { active = on; sync(); if (on) draw(performance.now()); } };
-})();
+})(); } catch (e) { console.error("mesh disabled:", e); }
 
 // ---------- IST clock ----------
 const clock = document.getElementById("clock");
@@ -781,8 +783,13 @@ function route(initial) {
   const label = document.getElementById("route");
   if (label) label.textContent = view.dataset.view.toUpperCase();
   mesh.setActive(view.dataset.view === "home");
+  // #/work/passgen opens and scrolls to that case study
+  const sub = document.getElementById("case-" + location.hash.split("/")[2]);
+  const caseStudy = sub && view.contains(sub) ? sub : null;
+  if (caseStudy) caseStudy.open = true;
   window.scrollTo({ top: 0, behavior: "instant" });
-  if (!initial) view.querySelector("h1").focus({ preventScroll: true });
+  if (caseStudy) caseStudy.scrollIntoView({ behavior: "instant" });
+  if (!initial) (caseStudy ? caseStudy.querySelector("summary") : view.querySelector("h1")).focus({ preventScroll: true });
 }
 addEventListener("hashchange", () => route(false));
 route(true);
