@@ -5,7 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kshitij Shettigar · Systems Software</title>
 <meta name="description" content="Kshitij G Shettigar. CS undergrad at PES University building a Rust process-migration VM, a zero-knowledge password manager, and FHIR health-data tooling.">
+<meta name="theme-color" content="#0c1013">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230c1013'/%3E%3Ctext x='16' y='23' font-family='monospace' font-size='20' fill='%2346c68c' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+<link rel="preload" href="fonts/geist-700.woff2" as="font" type="font/woff2" crossorigin>
+<script>
+document.documentElement.classList.add("js");
+try {
+  if (!sessionStorage.getItem("booted") && !matchMedia("(prefers-reduced-motion: reduce)").matches)
+    document.documentElement.classList.add("boot");
+  sessionStorage.setItem("booted", "1");
+} catch (e) {}
+</script>
 <style>
 @font-face { font-family: "Geist"; src: url("fonts/geist-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
 @font-face { font-family: "Geist"; src: url("fonts/geist-500.woff2") format("woff2"); font-weight: 500; font-display: swap; }
@@ -23,11 +33,11 @@
   --accent-ink: #08130d;
   --sans: "Geist", system-ui, -apple-system, sans-serif;
   --mono: "JBMono", ui-monospace, "Cascadia Mono", monospace;
+  /* z-index scale: hero copy 1, header 10, HUD chrome 20, boot screen 50 */
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+html { scroll-behavior: smooth; color-scheme: dark; }
 
 body {
   background: var(--bg);
@@ -41,6 +51,8 @@ body {
 ::selection { background: var(--accent); color: var(--accent-ink); }
 a { color: inherit; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+[tabindex="-1"]:focus { outline: none; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 .wrap { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
 
@@ -51,37 +63,37 @@ header {
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--line);
 }
-.nav {
-  height: 64px; display: flex; align-items: center; justify-content: space-between;
-}
-.nav .mark { font-family: var(--mono); font-size: 14px; letter-spacing: -.02em; text-decoration: none; color: var(--text); }
+.nav { height: 64px; display: flex; align-items: center; gap: 28px; }
+.nav .mark { font-family: var(--mono); font-size: 14px; letter-spacing: -.02em; text-decoration: none; margin-right: auto; }
 .nav .mark b { color: var(--accent); font-weight: 500; }
-.nav ul { display: flex; gap: 28px; list-style: none; align-items: center; }
+.nav ul { display: flex; gap: 28px; list-style: none; }
 .nav ul a { font-size: 14px; color: var(--muted); text-decoration: none; transition: color .2s; }
 .nav ul a:hover { color: var(--text); }
-.nav ul a.gh { color: var(--text); font-family: var(--mono); font-size: 13px; }
-.nav ul a.gh:hover { color: var(--accent); }
+.nav ul a[aria-current="page"] { color: var(--text); text-decoration: underline 1px var(--accent); text-underline-offset: 8px; }
+.nav .gh { font-family: var(--mono); font-size: 13px; text-decoration: none; transition: color .2s; }
+.nav .gh:hover { color: var(--accent); }
 
-/* ---------- hero ---------- */
-.hero { min-height: calc(100dvh - 64px); display: grid; grid-template-columns: 6fr 5fr; gap: 64px; align-items: center; padding: 48px 0 64px; }
-.hero h1 {
-  font-size: clamp(2.2rem, 4.6vw, 3.6rem);
-  font-weight: 700; letter-spacing: -.035em; line-height: 1.06;
-  max-width: 14ch;
-}
-.hero h1 em { font-style: italic; color: var(--accent); line-height: 1.1; }
-.hero .sub { margin-top: 22px; color: var(--muted); font-size: 17px; max-width: 46ch; }
-.hero .cta { margin-top: 36px; display: flex; gap: 14px; flex-wrap: wrap; }
+/* ---------- shared ---------- */
+.eyebrow { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .18em; color: var(--accent); }
+h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; letter-spacing: -.03em; line-height: 1.15; }
+.band { padding: 96px 0; }
+
 .btn {
-  display: inline-block; padding: 13px 26px; font-size: 15px; font-weight: 500;
-  text-decoration: none; border: 1px solid transparent;
-  transition: transform .15s, background .2s, border-color .2s;
+  display: inline-flex; align-items: center; padding: 13px 24px; border-radius: 999px;
+  font-size: 15px; font-weight: 500; text-decoration: none; white-space: nowrap;
+  border: 1px solid transparent;
+  transition: transform .15s, background .2s, border-color .2s, color .2s;
 }
 .btn:active { transform: translateY(1px); }
 .btn-primary { background: var(--accent); color: var(--accent-ink); }
 .btn-primary:hover { background: #58d49b; }
 .btn-ghost { border-color: var(--line); color: var(--text); }
 .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+.tags { display: flex; gap: 8px; flex-wrap: wrap; }
+.tag { font-family: var(--mono); font-size: 12px; border: 1px solid var(--line); padding: 4px 10px; }
+.repo-link { font-family: var(--mono); font-size: 13.5px; color: var(--accent); text-decoration: none; overflow-wrap: anywhere; }
+.repo-link:hover { text-decoration: underline; text-underline-offset: 4px; }
 
 .code {
   border: 1px solid var(--line); background: var(--bg-raised);
@@ -91,54 +103,107 @@ header {
 .code .path { color: var(--muted); font-size: 11.5px; display: block; margin-bottom: 14px; }
 .code pre { font-family: inherit; }
 .code .k { color: var(--accent); }
-.code .c { color: #5d6a73; }
 .code .t { color: #c9d4dc; }
 
-/* ---------- sections ---------- */
-section { padding: 96px 0; border-top: 1px solid var(--line); }
-.eyebrow { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .18em; color: var(--accent); margin-bottom: 14px; }
-h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; letter-spacing: -.03em; margin-bottom: 48px; }
-
-/* featured: parakaya full row */
-.feature { display: grid; grid-template-columns: 5fr 7fr; gap: 56px; padding: 40px 0; }
-.feature h3 { font-size: clamp(1.7rem, 3.4vw, 2.6rem); font-weight: 700; letter-spacing: -.03em; line-height: 1.1; }
-.feature h3 a { text-decoration: none; transition: color .2s; }
-.feature h3 a:hover { color: var(--accent); }
-.feature .role { font-family: var(--mono); font-size: 12.5px; color: var(--muted); margin-top: 10px; }
-.feature p { color: var(--muted); max-width: 60ch; }
-.feature p + p { margin-top: 14px; }
-.feature .tags { margin-top: 22px; display: flex; gap: 10px; flex-wrap: wrap; }
-.tag { font-family: var(--mono); font-size: 12px; color: var(--text); border: 1px solid var(--line); padding: 5px 10px; }
-.repo-link { display: inline-block; margin-top: 24px; font-family: var(--mono); font-size: 13.5px; color: var(--accent); text-decoration: none; }
-.repo-link:hover { text-decoration: underline; text-underline-offset: 4px; }
-
-/* featured: pair grid */
-.pair { display: grid; grid-template-columns: 3fr 2fr; gap: 56px; margin-top: 40px; padding-top: 56px; border-top: 1px solid var(--line); }
-.pair article h3 { font-size: 1.35rem; font-weight: 700; letter-spacing: -.02em; }
-.pair article h3 a { text-decoration: none; }
-.pair article h3 a:hover { color: var(--accent); }
-.pair article p { color: var(--muted); margin-top: 12px; font-size: 15.5px; }
-.pair .tags { margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; }
-
-/* repo6uard callout */
-.callout {
-  margin-top: 56px; border: 1px solid var(--line); background: var(--bg-raised);
-  padding: 44px; display: grid; grid-template-columns: 2fr 3fr; gap: 56px;
+/* ---------- home: hero ---------- */
+.hero { position: relative; min-height: calc(100dvh - 64px); display: flex; align-items: center; padding-block: 48px 64px; }
+.hero-copy { position: relative; z-index: 1; }
+.hero h1 {
+  font-size: clamp(2.6rem, 9.2vw, 8.75rem);
+  font-weight: 700; line-height: .9; letter-spacing: -.045em; text-transform: uppercase;
+  margin: 18px 0 28px;
 }
-.callout h3 { font-size: 1.5rem; font-weight: 700; letter-spacing: -.02em; }
-.callout h3 a { text-decoration: none; }
-.callout h3 a:hover { color: var(--accent); }
-.callout .role { font-family: var(--mono); font-size: 12.5px; color: var(--muted); margin-top: 10px; }
-.callout p { color: var(--muted); font-size: 15.5px; }
-.callout p + p { margin-top: 14px; }
-.callout .tags { margin-top: 22px; display: flex; gap: 10px; flex-wrap: wrap; }
+.hero h1 span { display: block; }
+@supports (-webkit-text-stroke: 1px black) {
+  .hero h1 .outline { color: transparent; -webkit-text-stroke: 1.5px var(--text); }
+}
+.hero .sub { color: var(--muted); font-size: 17px; max-width: 44ch; }
+.hero .cta { margin-top: 32px; display: flex; gap: 12px; flex-wrap: wrap; }
 
-/* more work */
+.stage { position: absolute; inset: 0 0 0 38%; }
+html:not(.js) .stage { display: none; }
+#mesh { display: block; width: 100%; height: 100%; cursor: grab; touch-action: pan-y; }
+#mesh:active { cursor: grabbing; }
+.mesh-hud { position: absolute; top: 28px; left: 0; display: flex; gap: 20px; font-family: var(--mono); font-size: 11px; letter-spacing: .14em; color: var(--muted); }
+.mesh-hud b { color: var(--accent); font-weight: 500; }
+
+.hud-card {
+  position: absolute; right: 24px; bottom: 48px; z-index: 1; list-style: none;
+  font-family: var(--mono); font-size: 12.5px; line-height: 2;
+  border-left: 1px solid var(--accent); padding-left: 16px;
+}
+.hud-card a { text-decoration: none; }
+.hud-card a:hover { color: var(--accent); }
+.hud-card .open::before {
+  content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 0 3px rgba(70,198,140,.18); margin-right: 10px;
+}
+
+/* ---------- home: marquee ---------- */
+.marquee { border-block: 1px solid var(--line); overflow: hidden; padding: 18px 0; }
+.marquee-track { display: flex; width: max-content; animation: marquee 40s linear infinite; }
+.marquee-track span { font-family: var(--mono); font-size: 13px; letter-spacing: .2em; color: var(--muted); white-space: nowrap; }
+.marquee-track i { font-style: normal; color: var(--accent); margin: 0 1.4em; } /* trailing ✳ margin = seam gap, so the loop is seamless */
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+/* ---------- home: featured ---------- */
+.band h2 { margin-bottom: 40px; }
+.featured { display: grid; grid-template-columns: 7fr 5fr; grid-template-rows: auto auto; gap: 16px; }
+.tile {
+  display: block; text-decoration: none; padding: 32px;
+  border: 1px solid var(--line); background: var(--bg-raised);
+  transition: border-color .25s, transform .25s cubic-bezier(.16,1,.3,1);
+}
+.tile:hover { border-color: var(--accent); transform: translateY(-2px); }
+.tile h3 { font-size: 1.35rem; font-weight: 700; letter-spacing: -.02em; }
+.tile p { color: var(--muted); margin-top: 10px; font-size: 15.5px; max-width: 52ch; }
+.tile .tags { margin-top: 20px; }
+.tile.big {
+  grid-row: span 2; min-height: 420px;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  background: radial-gradient(120% 90% at 85% 10%, rgba(70,198,140,.16), transparent 60%), var(--bg-raised);
+}
+.tile.big h3 { font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -.035em; line-height: 1.05; }
+.tile .go { display: inline-block; margin-top: 24px; font-family: var(--mono); font-size: 13px; color: var(--accent); }
+.tile .go::after { content: " \2192"; }
+
+/* ---------- home: numbers + closer ---------- */
+.numbers { display: grid; grid-template-columns: repeat(4, 1fr); border-block: 1px solid var(--line); }
+.numbers div { padding: 36px 24px 32px 0; }
+.numbers div + div { border-left: 1px solid var(--line); padding-left: 24px; }
+.numbers b { display: block; font-family: var(--mono); font-weight: 500; font-size: clamp(2.2rem, 4.4vw, 3.4rem); letter-spacing: -.04em; line-height: 1; color: var(--accent); }
+.numbers span { display: block; margin-top: 12px; color: var(--muted); font-size: 14.5px; }
+.closer h2 { margin-bottom: 28px; max-width: 20ch; }
+
+/* ---------- inner views ---------- */
+.view-head { padding: 72px 0 40px; }
+.view-head h1 { font-size: clamp(2.2rem, 5vw, 4rem); font-weight: 700; letter-spacing: -.04em; line-height: 1.02; max-width: 18ch; }
+.view-head p { color: var(--muted); margin-top: 18px; max-width: 56ch; }
+.view:not(:first-child) { padding-bottom: 96px; }
+
+/* work: case studies */
+.case { border-top: 1px solid var(--line); }
+.case:last-of-type { border-bottom: 1px solid var(--line); }
+.case summary {
+  list-style: none; cursor: pointer; padding: 32px 0;
+  display: grid; grid-template-columns: 1fr auto; gap: 6px 24px; align-items: baseline;
+}
+.case summary::-webkit-details-marker { display: none; }
+.case h2 { font-size: clamp(1.5rem, 3vw, 2.2rem); transition: color .2s; }
+.case summary:hover h2 { color: var(--accent); }
+.case .role { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+.case .toggle { grid-column: 2; grid-row: 1 / span 2; font-family: var(--mono); font-size: 22px; color: var(--accent); transition: transform .3s; }
+.case[open] .toggle { transform: rotate(45deg); }
+.par { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; padding-bottom: 32px; }
+.par h3 { font-family: var(--mono); font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .16em; color: var(--accent); margin-bottom: 10px; }
+.par p { color: var(--muted); font-size: 15.5px; }
+.case .code { margin-bottom: 28px; }
+.case-foot { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: center; padding-bottom: 40px; }
+
+.more { padding-top: 96px; }
+.more h2 { margin-bottom: 40px; }
 .more-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px 64px; }
-.more-grid a {
-  text-decoration: none; display: block; padding-bottom: 20px;
-  border-bottom: 1px solid var(--line); transition: border-color .2s;
-}
+.more-grid a { text-decoration: none; display: block; padding-bottom: 20px; border-bottom: 1px solid var(--line); transition: border-color .2s; }
 .more-grid a:hover { border-color: var(--accent); }
 .more-grid .name { font-family: var(--mono); font-size: 14.5px; font-weight: 500; }
 .more-grid a:hover .name { color: var(--accent); }
@@ -146,81 +211,232 @@ h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; letter-spacing: -.
 .all-repos { display: inline-block; margin-top: 40px; font-family: var(--mono); font-size: 13.5px; color: var(--accent); text-decoration: none; }
 .all-repos:hover { text-decoration: underline; text-underline-offset: 4px; }
 
+/* journey */
+.rail { list-style: none; max-width: 760px; margin-left: 6px; padding-left: 32px; border-left: 1px solid var(--line); }
+.rail li { position: relative; padding-bottom: 36px; }
+.rail li:last-child { padding-bottom: 0; }
+.rail li::before {
+  content: ""; position: absolute; left: -38px; top: 7px; width: 11px; height: 11px;
+  border: 1px solid var(--accent); background: var(--bg); transform: rotate(45deg);
+}
+.rail li:first-child::before { background: var(--accent); }
+.rail .year { display: block; font-family: var(--mono); font-size: 13px; color: var(--accent); }
+.rail p { margin-top: 4px; }
+.rail .detail { color: var(--muted); font-size: 15px; }
+
 /* about */
 .about { display: grid; grid-template-columns: 5fr 6fr; gap: 72px; }
 .about .bio p { color: var(--muted); }
 .about .bio p + p { margin-top: 16px; }
-.skills { display: grid; grid-template-columns: 1fr 1fr; gap: 36px 48px; }
-.skills h4 { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .14em; color: var(--muted); font-weight: 500; margin-bottom: 12px; }
+.skills { display: grid; grid-template-columns: 1fr 1fr; gap: 36px 48px; align-content: start; }
+.skills h2 { font-family: var(--mono); font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .14em; color: var(--muted); margin-bottom: 12px; }
 .skills ul { list-style: none; }
 .skills li { font-size: 15px; padding: 3px 0; }
 
-/* milestones */
-.timeline { display: grid; gap: 26px; max-width: 720px; }
-.trow { display: grid; grid-template-columns: 88px 1fr; gap: 20px; align-items: baseline; }
-.trow .year { font-family: var(--mono); font-size: 13.5px; color: var(--accent); }
-.trow span:last-child { color: var(--muted); }
-
 /* contact */
-.contact h2 { margin-bottom: 20px; }
-.contact p { color: var(--muted); max-width: 50ch; margin-bottom: 36px; }
-.contact .links { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
-.contact .alt { font-family: var(--mono); font-size: 13.5px; color: var(--muted); text-decoration: none; padding: 13px 6px; }
-.contact .alt:hover { color: var(--accent); }
+.links { display: flex; gap: 12px; flex-wrap: wrap; }
+.channels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--line); }
+.channels dt { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .14em; color: var(--muted); }
+.channels dd { margin-top: 6px; font-family: var(--mono); font-size: 15px; overflow-wrap: anywhere; }
+.channels a { text-decoration: none; }
+.channels a:hover { color: var(--accent); }
 
 footer { border-top: 1px solid var(--line); padding: 28px 0; }
-footer .wrap { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+footer .wrap { display: flex; justify-content: space-between; gap: 16px; font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
 
-/* reveal motion */
-.reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1); }
-.reveal.in { opacity: 1; transform: none; }
+/* ---------- HUD chrome ---------- */
+.nav .clock { font-family: var(--mono); font-size: 12px; color: var(--muted); min-width: 12ch; text-align: right; }
+.corner { position: fixed; z-index: 20; width: 14px; height: 14px; pointer-events: none; border: 0 solid rgba(70,198,140,.55); }
+.corner.tl { top: 8px; left: 8px; border-width: 1px 0 0 1px; }
+.corner.tr { top: 8px; right: 8px; border-width: 1px 1px 0 0; }
+.corner.bl { bottom: 8px; left: 8px; border-width: 0 0 1px 1px; }
+.corner.br { bottom: 8px; right: 8px; border-width: 0 1px 1px 0; }
+.hud {
+  position: fixed; top: 50%; z-index: 20; pointer-events: none; display: none;
+  writing-mode: vertical-rl; font-family: var(--mono); font-size: 10.5px; letter-spacing: .24em; color: var(--muted);
+}
+.hud.side { left: 20px; transform: translateY(-50%) rotate(180deg); }
+.hud.viewtag { right: 20px; transform: translateY(-50%); }
+.hud.viewtag span { color: var(--accent); }
+@media (min-width: 1280px) { .hud { display: block; } }
+
+/* boot screen: first visit only, fades itself out even if later JS fails */
+#boot { display: none; }
+.boot #boot {
+  position: fixed; inset: 0; z-index: 50; display: grid; place-content: center;
+  background: var(--bg); font-family: var(--mono); font-size: 13px; color: var(--muted); white-space: pre;
+  animation: boot-out .3s 1.05s forwards;
+}
+#boot p { opacity: 0; animation: boot-in 0s forwards; }
+#boot p:nth-child(2) { animation-delay: .25s; }
+#boot p:nth-child(3) { animation-delay: .5s; }
+#boot p:nth-child(4) { animation-delay: .8s; color: var(--text); letter-spacing: .3em; }
+#boot b { color: var(--accent); font-weight: 500; }
+@keyframes boot-in { to { opacity: 1; } }
+@keyframes boot-out { to { opacity: 0; visibility: hidden; } }
+
+/* ---------- reveal motion (JS only, so no-JS visitors see everything) ---------- */
+.js .reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1); }
+.js .reveal.in { opacity: 1; transform: none; }
+
 @media (prefers-reduced-motion: reduce) {
-  .reveal { opacity: 1; transform: none; transition: none; }
+  html { scroll-behavior: auto; }
+  .marquee-track { animation: none; }
+  .js .reveal { opacity: 1; transform: none; transition: none; }
+  .tile, .tile:hover { transition: none; transform: none; }
 }
 
-/* mobile */
+/* ---------- mobile ---------- */
 @media (max-width: 860px) {
-  .hero { grid-template-columns: 1fr; gap: 48px; min-height: 0; padding: 64px 0; }
-  .feature, .pair, .about, .callout { grid-template-columns: 1fr; gap: 32px; }
-  .callout { padding: 28px; }
-  .more-grid { grid-template-columns: 1fr; }
-  .skills { grid-template-columns: 1fr 1fr; }
-  section { padding: 72px 0; }
-  .nav ul { gap: 18px; }
-  .nav ul li.hide-sm { display: none; }
+  .hero { flex-direction: column; align-items: stretch; min-height: 0; padding-block: 40px 48px; }
+  .stage { position: relative; inset: auto; height: 340px; margin-top: 56px; }
+  .mesh-hud { top: -28px; }
+  .hud-card { position: static; margin-top: 8px; }
+  .band { padding: 72px 0; }
+  .featured, .about, .par { grid-template-columns: 1fr; }
+  .featured { grid-template-rows: none; }
+  .tile.big { grid-row: auto; min-height: 320px; }
+  .par { gap: 24px; }
+  .more-grid, .channels { grid-template-columns: 1fr; }
+  .numbers { grid-template-columns: 1fr 1fr; }
+  .numbers div { padding: 24px 16px 24px 0; }
+  .numbers div:nth-child(3) { border-left: 0; padding-left: 0; }
+  .numbers div:nth-child(n+3) { border-top: 1px solid var(--line); }
+  .about { gap: 48px; }
+}
+@media (max-width: 640px) {
+  .wrap { padding-inline: 16px; }
+  .nav { gap: 16px; }
+  .nav ul { gap: 16px; }
+  .nav ul a { font-size: 13px; }
+  .m-hide, .nav .gh, .nav .clock { display: none; }
+  .tile { padding: 24px; }
+  .code { padding: 18px; }
 }
 </style>
 </head>
 <body>
 
+<div id="boot" aria-hidden="true">
+<p>&gt; checkpoint   x86_64    <b>ok</b></p>
+<p>&gt; transfer     snapshot  <b>ok</b></p>
+<p>&gt; restore      aarch64   <b>ok</b></p>
+<p>READY</p>
+</div>
+<span class="corner tl" aria-hidden="true"></span><span class="corner tr" aria-hidden="true"></span><span class="corner bl" aria-hidden="true"></span><span class="corner br" aria-hidden="true"></span>
+<p class="hud side" aria-hidden="true">KSHITIJ@SHETTIGAR // SYSTEMS</p>
+<p class="hud viewtag" aria-hidden="true">VIEW://<span id="route">HOME</span></p>
+
 <header>
   <div class="wrap nav">
-    <a class="mark" href="#">kshitij<b>@</b>shettigar</a>
-    <nav>
+    <a class="mark" href="#/home" aria-label="Kshitij Shettigar, home">k<span class="m-hide">shitij</span><b>@</b>s<span class="m-hide">hettigar</span></a>
+    <nav aria-label="Primary">
       <ul>
-        <li class="hide-sm"><a href="#work">Work</a></li>
-        <li class="hide-sm"><a href="#about">About</a></li>
-        <li class="hide-sm"><a href="#contact">Contact</a></li>
-        <li><a class="gh" href="https://github.com/Kishi836" target="_blank" rel="noopener">github/Kishi836</a></li>
+        <li><a href="#/work">Work</a></li>
+        <li><a href="#/journey">Journey</a></li>
+        <li><a href="#/about">About</a></li>
+        <li><a href="#/contact">Contact</a></li>
       </ul>
     </nav>
+    <a class="gh" href="https://github.com/Kishi836" target="_blank" rel="noopener">github/Kishi836</a>
+    <span class="clock" id="clock" aria-hidden="true"></span>
   </div>
 </header>
 
 <main>
-  <div class="wrap">
-    <div class="hero">
-      <div>
-        <h1>Systems software, from VM internals to <em>vault crypto</em>.</h1>
-        <p class="sub">Third-year CS undergrad at PES University, Bangalore. Currently building Parakaya, a Rust VM that migrates live processes between machines.</p>
+  <!-- ids like "/work" let #/work links jump to the right section even with JS off -->
+  <section class="view" data-view="home" id="/home" aria-labelledby="h-home">
+    <div class="wrap hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Systems software engineer</p>
+        <h1 id="h-home" tabindex="-1"><span>Kshitij</span> <span class="outline">Shettigar.</span></h1>
+        <p class="sub">Third-year CS undergrad at PES University, Bangalore. Building Parakaya, a Rust VM that migrates live processes between machines.</p>
         <div class="cta">
-          <a class="btn btn-primary" href="#work">View work</a>
+          <a class="btn btn-primary" href="#/work">Explore work</a>
           <a class="btn btn-ghost" href="resume.pdf" target="_blank" rel="noopener">Resume PDF</a>
         </div>
       </div>
-      <div class="code reveal">
-        <span class="path">parakaya/crates/parakaya-vm/src/instr.rs</span>
-        <pre><span class="k">pub enum</span> <span class="t">Instr</span> {
+      <div class="stage">
+        <canvas id="mesh" role="img" aria-label="Animated mesh of four machines, an x86_64 PC, an aarch64 Raspberry Pi, an Android phone and a cloud VM, passing process snapshots between them. Drag to rotate."></canvas>
+        <p class="mesh-hud" aria-hidden="true">PARAKAYA.MESH <span>NODES <b id="m-nodes">0</b></span> <span>MIGRATIONS <b id="m-mig">0</b></span></p>
+      </div>
+      <ul class="hud-card">
+        <li><a href="mailto:gskshitij0638@gmail.com">gskshitij0638@gmail.com</a></li>
+        <li>Bangalore, IST</li>
+        <li class="open">Open to summer-2027 internships</li>
+      </ul>
+    </div>
+
+    <div class="marquee">
+      <p class="sr-only">Focus areas: Rust, process VMs, zero-knowledge crypto, FHIR, robotics.</p>
+      <div class="marquee-track" aria-hidden="true">
+        <span>RUST<i>✳</i>PROCESS VMs<i>✳</i>ZERO-KNOWLEDGE CRYPTO<i>✳</i>FHIR<i>✳</i>ROBOTICS<i>✳</i></span>
+        <span>RUST<i>✳</i>PROCESS VMs<i>✳</i>ZERO-KNOWLEDGE CRYPTO<i>✳</i>FHIR<i>✳</i>ROBOTICS<i>✳</i></span>
+      </div>
+    </div>
+
+    <div class="band">
+      <div class="wrap">
+        <h2>Selected work</h2>
+        <div class="featured">
+          <a class="tile big reveal" href="#/work">
+            <h3>Parakaya</h3>
+            <p>A running program hops between a PC, a Raspberry Pi, a phone, and a cloud VM mid-execution, across CPU architectures, surviving power loss at any instant.</p>
+            <div class="tags"><span class="tag">Rust</span><span class="tag">process VM</span><span class="tag">checkpoint / resume</span></div>
+            <span class="go">Case study</span>
+          </a>
+          <a class="tile reveal" href="#/work">
+            <h3>PassGen Vault</h3>
+            <p>A zero-knowledge password manager: one AES-256-GCM vault, opened by a web app and a native Android client.</p>
+            <div class="tags"><span class="tag">Web Crypto</span><span class="tag">Android</span></div>
+          </a>
+          <a class="tile reveal" href="#/work">
+            <h3>Clinical Timeline Builder</h3>
+            <p>Twenty FHIR R4 resources for a diabetic care pathway, rebuilt into a chronological clinical timeline.</p>
+            <div class="tags"><span class="tag">Python</span><span class="tag">FHIR R4</span></div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <h2 class="sr-only">In numbers</h2>
+      <div class="numbers reveal">
+        <div><b>4</b><span>target architectures</span></div>
+        <div><b>600k</b><span>PBKDF2 iterations</span></div>
+        <div><b>&lt;30s</b><span>15-issue vulnerability scan</span></div>
+        <div><b>2019</b><span>FLL International, Sydney</span></div>
+      </div>
+    </div>
+
+    <div class="band">
+      <div class="wrap closer reveal">
+        <h2>Open to summer-2027 internships.</h2>
+        <a class="btn btn-primary" href="mailto:gskshitij0638@gmail.com">gskshitij0638@gmail.com</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" data-view="work" id="/work" aria-labelledby="h-work">
+    <div class="wrap">
+      <div class="view-head">
+        <h1 id="h-work" tabindex="-1">Four projects, four different problems.</h1>
+      </div>
+
+      <details class="case" open>
+        <summary>
+          <h2>Parakaya</h2>
+          <span class="role">Rust, custom instruction set, in active development</span>
+          <span class="toggle" aria-hidden="true">+</span>
+        </summary>
+        <div class="par">
+          <div><h3>Problem</h3><p>Make a running program hop between a PC, a Raspberry Pi, a phone and a cloud VM mid-execution, across CPU architectures, and survive power loss at any instant.</p></div>
+          <div><h3>Approach</h3><p>The VM core is a Rust workspace: a compact instruction set, tagged values, and execution state built to checkpoint on one architecture and resume on another. Designed spec-first, with decision records for every architectural call.</p></div>
+          <div><h3>Result</h3><p>In active development, so there are no results to claim yet. The instruction set below is from the current VM core.</p></div>
+        </div>
+        <div class="code">
+          <span class="path">parakaya/crates/parakaya-vm/src/instr.rs</span>
+          <pre><span class="k">pub enum</span> <span class="t">Instr</span> {
     I32Const(<span class="k">i32</span>),
     I32Add, I32Sub, I32Mul, I32DivS,
     LocalGet(<span class="k">u32</span>), LocalSet(<span class="k">u32</span>),
@@ -229,134 +445,153 @@ footer .wrap { display: flex; justify-content: space-between; font-family: var(-
     I32Load(<span class="t">MemArg</span>), I32Store(<span class="t">MemArg</span>),
     End,
 }</pre>
-      </div>
-    </div>
-  </div>
-
-  <section id="work">
-    <div class="wrap">
-      <p class="eyebrow">Selected work</p>
-      <h2>Four projects, four different problems.</h2>
-
-      <div class="feature reveal">
-        <div>
-          <h3><a href="https://github.com/Kishi836/parakaya" target="_blank" rel="noopener">Parakaya</a></h3>
-          <p class="role">Rust, custom instruction set, in active development</p>
         </div>
-        <div>
-          <p>A running program hops between a PC, a Raspberry Pi, a phone, and a cloud VM mid-execution, across CPU architectures, surviving power loss at any instant.</p>
-          <p>The VM core is a Rust workspace: a compact instruction set, tagged values, and execution state built to checkpoint on one architecture and resume on another. Designed spec-first, with decision records for every architectural call.</p>
+        <div class="case-foot">
           <div class="tags"><span class="tag">Rust</span><span class="tag">process VM</span><span class="tag">checkpoint / resume</span></div>
           <a class="repo-link" href="https://github.com/Kishi836/parakaya" target="_blank" rel="noopener">github.com/Kishi836/parakaya</a>
         </div>
-      </div>
+      </details>
 
-      <div class="pair">
-        <article class="reveal">
-          <h3><a href="https://github.com/Kishi836/passgen" target="_blank" rel="noopener">PassGen Vault</a></h3>
-          <p>A zero-knowledge password manager. One AES-256-GCM vault in OneDrive, opened by a single-file web app and a native Android client. PBKDF2 at 600,000 iterations, fingerprint unlock backed by hardware keys, and a generator built on a CSPRNG with rejection sampling so there is no modulo bias.</p>
+      <details class="case">
+        <summary>
+          <h2>PassGen Vault</h2>
+          <span class="role">Single-file web app and native Android client</span>
+          <span class="toggle" aria-hidden="true">+</span>
+        </summary>
+        <div class="par">
+          <div><h3>Problem</h3><p>One password vault shared by a laptop and an Android phone, without trusting any server with the plaintext.</p></div>
+          <div><h3>Approach</h3><p>One AES-256-GCM vault stored in OneDrive, opened by a single-file web app and a native Android client. Keys come from PBKDF2 at 600,000 iterations, and fingerprint unlock is backed by hardware keys.</p></div>
+          <div><h3>Result</h3><p>A working zero-knowledge password manager. Its generator is built on a CSPRNG with rejection sampling, so there is no modulo bias.</p></div>
+        </div>
+        <div class="case-foot">
           <div class="tags"><span class="tag">JavaScript</span><span class="tag">Android</span><span class="tag">Web Crypto</span><span class="tag">MS Graph</span></div>
           <a class="repo-link" href="https://github.com/Kishi836/passgen" target="_blank" rel="noopener">github.com/Kishi836/passgen</a>
-        </article>
-        <article class="reveal">
-          <h3><a href="https://github.com/Kishi836/project3-fhir-resource-modelling" target="_blank" rel="noopener">Clinical Timeline Builder</a></h3>
-          <p>Twenty hand-authored FHIR R4 resources modelling a diabetic care pathway, validated against a HAPI server and rebuilt into a chronological clinical timeline with Python. Coded with LOINC, ICD-10 and RxNorm.</p>
+        </div>
+      </details>
+
+      <details class="case">
+        <summary>
+          <h2>Clinical Timeline Builder</h2>
+          <span class="role">Medical Innovations and Technology minor, PES University</span>
+          <span class="toggle" aria-hidden="true">+</span>
+        </summary>
+        <div class="par">
+          <div><h3>Problem</h3><p>Represent a diabetic care pathway as standard FHIR R4 data, then turn that data back into something a clinician can read.</p></div>
+          <div><h3>Approach</h3><p>Twenty hand-authored FHIR R4 resources, coded with LOINC, ICD-10 and RxNorm and validated against a HAPI server.</p></div>
+          <div><h3>Result</h3><p>A Python pipeline that rebuilds the resources into a chronological clinical timeline.</p></div>
+        </div>
+        <div class="case-foot">
           <div class="tags"><span class="tag">Python</span><span class="tag">FHIR R4</span><span class="tag">HAPI</span></div>
           <a class="repo-link" href="https://github.com/Kishi836/project3-fhir-resource-modelling" target="_blank" rel="noopener">github.com/Kishi836/project3-fhir…</a>
-        </article>
-      </div>
-
-      <div class="callout reveal">
-        <div>
-          <h3><a href="https://github.com/Kishi836/repo6uard" target="_blank" rel="noopener">Repo6uard</a></h3>
-          <p class="role">Team of six, CIE Ignite startup program at PES</p>
-          <div class="tags"><span class="tag">Python / Flask</span><span class="tag">React</span><span class="tag">Bandit + njsscan</span><span class="tag">LLM</span><span class="tag">OSV / NVD</span></div>
         </div>
-        <div>
-          <p>A hybrid vulnerability scanner: static analysis finds known patterns, an LLM reasoning pass validates them in context and writes fix suggestions, and dependencies get cross-checked against Google's OSV and the NVD. The working prototype scanned a deliberately vulnerable repo and reported 15 issues across 8 OWASP categories in under 30 seconds.</p>
-          <p>We pitched it through two phases of the campus startup program and missed the final round by one position. The scanner still works.</p>
+      </details>
+
+      <details class="case">
+        <summary>
+          <h2>Repo6uard</h2>
+          <span class="role">Team of six, CIE Ignite startup program at PES</span>
+          <span class="toggle" aria-hidden="true">+</span>
+        </summary>
+        <div class="par">
+          <div><h3>Problem</h3><p>Pattern-based scanners flag code without context and say nothing about vulnerable dependencies.</p></div>
+          <div><h3>Approach</h3><p>A hybrid scanner: static analysis finds known patterns, an LLM reasoning pass validates them in context and writes fix suggestions, and dependencies get cross-checked against Google's OSV and the NVD.</p></div>
+          <div><h3>Result</h3><p>The working prototype scanned a deliberately vulnerable repo and reported 15 issues across 8 OWASP categories in under 30 seconds. We pitched it through two phases of the campus startup program and missed the final round by one position. The scanner still works.</p></div>
+        </div>
+        <div class="case-foot">
+          <div class="tags"><span class="tag">Python / Flask</span><span class="tag">React</span><span class="tag">Bandit + njsscan</span><span class="tag">LLM</span><span class="tag">OSV / NVD</span></div>
           <a class="repo-link" href="https://github.com/Kishi836/repo6uard" target="_blank" rel="noopener">github.com/Kishi836/repo6uard</a>
         </div>
+      </details>
+
+      <div class="more">
+        <h2>More on GitHub</h2>
+        <div class="more-grid">
+          <a href="https://github.com/Kishi836/network-traffic-classifier-cn" target="_blank" rel="noopener">
+            <div class="name">network-traffic-classifier</div>
+            <div class="desc">Traffic classification on Linux with Wireshark, POX and Mininet.</div>
+          </a>
+          <a href="https://github.com/Kishi836/meditech-lab-dashboard" target="_blank" rel="noopener">
+            <div class="name">meditech-lab-dashboard</div>
+            <div class="desc">Flask medical-informatics dashboard with an HL7 pipeline over PostgreSQL.</div>
+          </a>
+          <a href="https://github.com/Kishi836/secure-remote-command-execution" target="_blank" rel="noopener">
+            <div class="name">secure-remote-command-execution</div>
+            <div class="desc">Remote command execution over SSL/TLS sockets.</div>
+          </a>
+          <a href="https://github.com/Kishi836/vulnerable-demo-app" target="_blank" rel="noopener">
+            <div class="name">vulnerable-demo-app</div>
+            <div class="desc">Deliberately vulnerable app for demonstrating OSV and NVD scanning.</div>
+          </a>
+        </div>
+        <a class="all-repos" href="https://github.com/Kishi836?tab=repositories" target="_blank" rel="noopener">All repositories</a>
       </div>
     </div>
   </section>
 
-  <section>
+  <section class="view" data-view="journey" id="/journey" aria-labelledby="h-journey">
     <div class="wrap">
-      <h2>More on GitHub</h2>
-      <div class="more-grid">
-        <a class="reveal" href="https://github.com/Kishi836/network-traffic-classifier-cn" target="_blank" rel="noopener">
-          <div class="name">network-traffic-classifier</div>
-          <div class="desc">Traffic classification on Linux with Wireshark, POX and Mininet.</div>
-        </a>
-        <a class="reveal" href="https://github.com/Kishi836/meditech-lab-dashboard" target="_blank" rel="noopener">
-          <div class="name">meditech-lab-dashboard</div>
-          <div class="desc">Flask medical-informatics dashboard with an HL7 pipeline over PostgreSQL.</div>
-        </a>
-        <a class="reveal" href="https://github.com/Kishi836/secure-remote-command-execution" target="_blank" rel="noopener">
-          <div class="name">secure-remote-command-execution</div>
-          <div class="desc">Remote command execution over SSL/TLS sockets.</div>
-        </a>
-        <a class="reveal" href="https://github.com/Kishi836/vulnerable-demo-app" target="_blank" rel="noopener">
-          <div class="name">vulnerable-demo-app</div>
-          <div class="desc">Deliberately vulnerable app for demonstrating OSV and NVD scanning.</div>
-        </a>
+      <div class="view-head">
+        <h1 id="h-journey" tabindex="-1">Journey</h1>
       </div>
-      <a class="all-repos" href="https://github.com/Kishi836?tab=repositories" target="_blank" rel="noopener">All repositories</a>
+      <ol class="rail">
+        <li class="reveal"><span class="year">Now</span><p>CS at PES University, with a minor in Medical Innovations and Technology.</p><p class="detail">Electives this semester: AR/VR (OpenGL, Unity, Three.js) and ROS for Autonomous Systems (ROS 2 Humble, Gazebo, Webots).</p></li>
+        <li class="reveal"><span class="year">2026</span><p>Completed a two-month IoT and Robotics internship at Tripple One Solutions (Jun-Aug).</p><p class="detail">Embedded firmware, motor control and device-to-cloud connectivity.</p></li>
+        <li class="reveal"><span class="year">2026</span><p>Built a heart-disease prediction model at the Epoch Datathon.</p></li>
+        <li class="reveal"><span class="year">2022</span><p>Ranked 5th in school, CBSE Class 10 board examinations.</p></li>
+        <li class="reveal"><span class="year">2019</span><p>Represented India at the FIRST LEGO League International Championship in Sydney.</p></li>
+        <li class="reveal"><span class="year">2019</span><p>1st place and Best Project Award, FIRST LEGO League Regional.</p></li>
+      </ol>
     </div>
   </section>
 
-  <section id="about">
-    <div class="wrap about">
-      <div class="bio reveal">
-        <h2>About</h2>
-        <p>I got into computers through robotics: FIRST LEGO League, then representing India at the 2019 International Championship in Sydney. These days the obsession is lower level. I am an Arch Linux and Hyprland person, and I like problems where the OS, the hardware and the network all have opinions.</p>
-        <p>At PES University I study CS with a minor in Medical Innovations and Technology, which is where the FHIR work comes from. Over the summer of 2026 I did a two-month IoT and Robotics internship at Tripple One Solutions, working on embedded firmware, motor control and device-to-cloud connectivity. This semester I picked the two electives closest to the metal: AR/VR (OpenGL, Unity, Three.js) and ROS for Autonomous Systems (ROS 2 Humble, Gazebo, Webots).</p>
-        <p>Outside of code: keyboard, music production and cycling.</p>
-      </div>
-      <div class="skills reveal">
-        <div>
-          <h4>Languages</h4>
-          <ul><li>Python, C, C++</li><li>Rust</li><li>Java, JavaScript</li></ul>
-        </div>
-        <div>
-          <h4>Systems &amp; Robotics</h4>
-          <ul><li>Linux (Arch, Hyprland)</li><li>ROS 2, Gazebo, Webots</li><li>Arduino, Raspberry Pi</li></ul>
-        </div>
-        <div>
-          <h4>Security</h4>
-          <ul><li>Web Crypto, AES-GCM</li><li>Wireshark</li><li>Bandit, njsscan, OSV</li></ul>
-        </div>
-        <div>
-          <h4>Web</h4>
-          <ul><li>React, Node, Express</li><li>Flask, REST APIs</li><li>MongoDB, SQLite</li></ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section>
+  <section class="view" data-view="about" id="/about" aria-labelledby="h-about">
     <div class="wrap">
-      <h2>Milestones</h2>
-      <div class="timeline">
-        <div class="trow reveal"><span class="year">2026</span><span>Completed a two-month IoT and Robotics internship at Tripple One Solutions (Jun–Aug).</span></div>
-        <div class="trow reveal"><span class="year">2026</span><span>Built a heart-disease prediction model at the Epoch Datathon.</span></div>
-        <div class="trow reveal"><span class="year">2022</span><span>Ranked 5th in school, CBSE Class 10 board examinations.</span></div>
-        <div class="trow reveal"><span class="year">2019</span><span>Represented India at the FIRST LEGO League International Championship in Sydney.</span></div>
-        <div class="trow reveal"><span class="year">2019</span><span>1st place and Best Project Award, FIRST LEGO League Regional.</span></div>
+      <div class="view-head">
+        <h1 id="h-about" tabindex="-1">About</h1>
+      </div>
+      <div class="about">
+        <div class="bio reveal">
+          <p>I got into computers through robotics: FIRST LEGO League, then representing India at the 2019 International Championship in Sydney. These days the obsession is lower level. I am an Arch Linux and Hyprland person, and I like problems where the OS, the hardware and the network all have opinions.</p>
+          <p>At PES University I study CS with a minor in Medical Innovations and Technology, which is where the FHIR work comes from. Over the summer of 2026 I did a two-month IoT and Robotics internship at Tripple One Solutions, working on embedded firmware, motor control and device-to-cloud connectivity. This semester I picked the two electives closest to the metal: AR/VR (OpenGL, Unity, Three.js) and ROS for Autonomous Systems (ROS 2 Humble, Gazebo, Webots).</p>
+          <p>Outside of code: keyboard, music production and cycling.</p>
+        </div>
+        <div class="skills reveal">
+          <div>
+            <h2>Languages</h2>
+            <ul><li>Python, C, C++</li><li>Rust</li><li>Java, JavaScript</li></ul>
+          </div>
+          <div>
+            <h2>Systems &amp; Robotics</h2>
+            <ul><li>Linux (Arch, Hyprland)</li><li>ROS 2, Gazebo, Webots</li><li>Arduino, Raspberry Pi</li></ul>
+          </div>
+          <div>
+            <h2>Security</h2>
+            <ul><li>Web Crypto, AES-GCM</li><li>Wireshark</li><li>Bandit, njsscan, OSV</li></ul>
+          </div>
+          <div>
+            <h2>Web</h2>
+            <ul><li>React, Node, Express</li><li>Flask, REST APIs</li><li>MongoDB, SQLite</li></ul>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <section id="contact" class="contact">
-    <div class="wrap reveal">
-      <h2>Open to internships and collaboration.</h2>
-      <p>If you are working on systems, security or health-tech and want an engineer who reads the spec first, get in touch.</p>
+  <section class="view" data-view="contact" id="/contact" aria-labelledby="h-contact">
+    <div class="wrap">
+      <div class="view-head">
+        <h1 id="h-contact" tabindex="-1">Open to internships and collaboration.</h1>
+        <p>If you are working on systems, security or health-tech and want an engineer who reads the spec first, get in touch.</p>
+      </div>
       <div class="links">
         <a class="btn btn-primary" href="mailto:gskshitij0638@gmail.com">gskshitij0638@gmail.com</a>
-        <a class="alt" href="https://github.com/Kishi836" target="_blank" rel="noopener">GitHub</a>
-        <a class="alt" href="https://www.linkedin.com/in/kshitijgshettigar" target="_blank" rel="noopener">LinkedIn</a>
+        <a class="btn btn-ghost" href="resume.pdf" target="_blank" rel="noopener">Resume PDF</a>
       </div>
+      <dl class="channels">
+        <div><dt>GitHub</dt><dd><a href="https://github.com/Kishi836" target="_blank" rel="noopener">github.com/Kishi836</a></dd></div>
+        <div><dt>LinkedIn</dt><dd><a href="https://www.linkedin.com/in/kshitijgshettigar" target="_blank" rel="noopener">linkedin.com/in/kshitijgshettigar</a></dd></div>
+        <div><dt>Based in</dt><dd>Bangalore, India (IST)</dd></div>
+      </dl>
     </div>
   </section>
 </main>
@@ -370,6 +605,189 @@ footer .wrap { display: flex; justify-content: space-between; font-family: var(-
 
 <script>
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// ---------- Parakaya mesh: four machines passing process snapshots ----------
+const mesh = (() => {
+  const cv = document.getElementById("mesh");
+  const ctx = cv.getContext("2d");
+  const PER = matchMedia("(max-width: 860px)").matches ? 16 : 28;
+  const GREEN = "70,198,140", AMBER = "232,163,61";
+  const norm = v => { const l = Math.hypot(...v); return v.map(c => c / l); };
+  const d2 = (a, b) => (a.p[0] - b.p[0]) ** 2 + (a.p[1] - b.p[1]) ** 2 + (a.p[2] - b.p[2]) ** 2;
+
+  // one cluster per machine, on the corners of a tetrahedron
+  const clusters = [["x86_64 PC", [1, 1, 1]], ["aarch64 Pi", [1, -1, -1]], ["android", [-1, 1, -1]], ["cloud VM", [-1, -1, 1]]]
+    .map(([name, v]) => ({ name: name.toUpperCase(), c: norm(v), flash: 0, nodes: [] }));
+  const nodes = [], links = [];
+  for (const cl of clusters) {
+    for (let i = 0; i < PER; i++) {
+      let o;
+      do o = [Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1]; while (Math.hypot(...o) > 1);
+      const n = { p: cl.c.map((c, k) => c + o[k] * 0.34), cl, q: null };
+      cl.nodes.push(n);
+      nodes.push(n);
+    }
+    for (const n of cl.nodes) // link each node to its two nearest neighbours
+      for (const m of cl.nodes.filter(m => m !== n).sort((a, b) => d2(a, n) - d2(b, n)).slice(0, 2)) links.push([n, m]);
+  }
+
+  // a curved arc between every pair of machines, sampled as 49 points
+  const arcs = [];
+  for (let i = 0; i < 4; i++) for (let j = i + 1; j < 4; j++) {
+    const a = clusters[i].c, b = clusters[j].c, mid = norm(a.map((v, k) => v + b[k])).map(v => v * 1.5);
+    const pts = [];
+    for (let s = 0; s <= 48; s++) {
+      const t = s / 48, u = 1 - t;
+      pts.push(a.map((v, k) => u * u * v + 2 * u * t * mid[k] + t * t * b[k]));
+    }
+    arcs.push({ i, j, pts });
+  }
+
+  document.getElementById("m-nodes").textContent = nodes.length;
+  const migOut = document.getElementById("m-mig");
+  let W = 0, H = 0, F = 0, rx = -0.35, ry = 0.6;
+  let raf = 0, last = 0, nextPulse = 0, migrations = 0, pulses = [];
+  let active = false, onScreen = true, dragging = false, px = 0, py = 0;
+
+  // rotate by (rx, ry), then perspective-project; d is depth scale (~0.7 far, ~1.8 near)
+  function project(p) {
+    const cy = Math.cos(ry), sy = Math.sin(ry), cx = Math.cos(rx), sx = Math.sin(rx);
+    const x = p[0] * cy + p[2] * sy, z1 = p[2] * cy - p[0] * sy;
+    const y = p[1] * cx - z1 * sx, z = p[1] * sx + z1 * cx;
+    const d = 3.2 / (z + 3.2), s = d * F / 3.2;
+    return [W / 2 + x * s, H / 2 + y * s, d];
+  }
+
+  function dot(x, y, r) { ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); }
+
+  function draw(now) {
+    if (!W) return;
+    ctx.clearRect(0, 0, W, H);
+    ctx.globalCompositeOperation = "lighter";
+    for (const n of nodes) n.q = project(n.p);
+
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = `rgba(${GREEN},.16)`;
+    ctx.beginPath();
+    for (const [a, b] of links) { ctx.moveTo(a.q[0], a.q[1]); ctx.lineTo(b.q[0], b.q[1]); }
+    ctx.stroke();
+
+    ctx.setLineDash([2, 6]);
+    ctx.strokeStyle = `rgba(${GREEN},.2)`;
+    ctx.beginPath();
+    for (const { pts } of arcs) pts.forEach((p, k) => { const [x, y] = project(p); k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    for (const n of nodes) {
+      const [x, y, d] = n.q;
+      ctx.fillStyle = `rgba(${GREEN},${Math.min(1, Math.max(0.15, d - 0.6))})`;
+      dot(x, y, 1.5 * d);
+      if (n.cl.flash > 0.02) { ctx.fillStyle = `rgba(${AMBER},${n.cl.flash * 0.6})`; dot(x, y, 3 * d); }
+    }
+
+    for (const p of pulses) { // amber snapshot with a short fading trail
+      const head = Math.min(1, (now - p.t0) / 1100) * 48;
+      for (let k = 0; k < 8; k++) {
+        const i = Math.round(head - k * 1.2);
+        if (i < 0) break;
+        const [x, y, d] = project(p.pts[i]);
+        ctx.fillStyle = `rgba(${AMBER},${0.9 * (1 - k / 8)})`;
+        dot(x, y, (3.2 - k * 0.3) * d);
+      }
+    }
+
+    ctx.globalCompositeOperation = "source-over";
+    ctx.font = "500 10.5px JBMono, monospace";
+    ctx.textAlign = "center";
+    for (const cl of clusters) {
+      const [x, y, d] = project(cl.c.map(v => v * 1.45));
+      ctx.fillStyle = `rgba(150,162,171,${Math.min(1, Math.max(0.25, d - 0.4))})`;
+      ctx.fillText(cl.name, x, y);
+    }
+  }
+
+  function step(now) {
+    const dt = Math.min(50, now - last);
+    last = now;
+    if (!dragging) ry += dt * 0.00012;
+    for (const cl of clusters) cl.flash *= Math.pow(0.93, dt / 16);
+    if (now >= nextPulse) {
+      const arc = arcs[Math.floor(Math.random() * arcs.length)], back = Math.random() < 0.5;
+      pulses.push({ t0: now, pts: back ? [...arc.pts].reverse() : arc.pts, to: clusters[back ? arc.i : arc.j] });
+      nextPulse = now + 1500;
+    }
+    pulses = pulses.filter(p => {
+      if (now - p.t0 < 1100) return true;
+      p.to.flash = 1;
+      migOut.textContent = ++migrations;
+      return false;
+    });
+    draw(now);
+    raf = requestAnimationFrame(step);
+  }
+
+  // run only while home is shown, the tab is visible and the canvas is on screen
+  function sync() {
+    const go = active && onScreen && !document.hidden && !reduce;
+    if (go && !raf) { last = performance.now(); raf = requestAnimationFrame(step); }
+    if (!go && raf) { cancelAnimationFrame(raf); raf = 0; }
+  }
+  document.addEventListener("visibilitychange", sync);
+  new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; sync(); }).observe(cv);
+
+  new ResizeObserver(() => {
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    W = cv.clientWidth; H = cv.clientHeight; F = Math.min(W, H) * 0.95;
+    cv.width = W * dpr; cv.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw(performance.now());
+  }).observe(cv);
+
+  cv.addEventListener("pointerdown", e => { dragging = true; px = e.clientX; py = e.clientY; cv.setPointerCapture(e.pointerId); });
+  cv.addEventListener("pointermove", e => {
+    if (!dragging) return;
+    ry += (e.clientX - px) * 0.006;
+    rx = Math.max(-0.9, Math.min(0.9, rx + (e.clientY - py) * 0.006));
+    px = e.clientX; py = e.clientY;
+    if (!raf) draw(performance.now()); // reduced motion: still lets you turn the static frame
+  });
+  const release = () => { dragging = false; };
+  cv.addEventListener("pointerup", release);
+  cv.addEventListener("pointercancel", release);
+
+  return { setActive(on) { active = on; sync(); if (on) draw(performance.now()); } };
+})();
+
+// ---------- IST clock ----------
+const clock = document.getElementById("clock");
+const ist = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" });
+const tick = () => { clock.textContent = "IST " + ist.format(new Date()); };
+tick();
+setInterval(tick, 1000);
+
+// ---------- router: #/view toggles which <section data-view> is shown ----------
+const views = [...document.querySelectorAll("[data-view]")];
+const navLinks = [...document.querySelectorAll(".nav nav a")];
+for (const v of views) v.removeAttribute("id"); // the "/work"-style ids are only for no-JS jumps; with JS they make the browser scroll past the header
+function route(initial) {
+  const name = location.hash.replace(/^#\/?/, "").split("/")[0];
+  const view = views.find(v => v.dataset.view === name) || views[0];
+  for (const v of views) v.hidden = v !== view;
+  for (const a of navLinks) {
+    if (a.getAttribute("href") === "#/" + view.dataset.view) a.setAttribute("aria-current", "page");
+    else a.removeAttribute("aria-current");
+  }
+  const label = document.getElementById("route");
+  if (label) label.textContent = view.dataset.view.toUpperCase();
+  mesh.setActive(view.dataset.view === "home");
+  window.scrollTo({ top: 0, behavior: "instant" });
+  if (!initial) view.querySelector("h1").focus({ preventScroll: true });
+}
+addEventListener("hashchange", () => route(false));
+route(true);
+
+// ---------- reveal on scroll ----------
 if (reduce) {
   document.querySelectorAll(".reveal").forEach(el => el.classList.add("in"));
 } else {
