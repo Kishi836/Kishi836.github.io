@@ -208,6 +208,8 @@ html:not(.js) .stage { display: none; }
 .more-grid .name { font-family: var(--mono); font-size: 14.5px; font-weight: 500; }
 .more-grid a:hover .name { color: var(--accent); }
 .more-grid .desc { color: var(--muted); font-size: 14.5px; margin-top: 6px; }
+.more-grid > div { padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+.skills.six { grid-template-columns: repeat(3, 1fr); }
 .all-repos { display: inline-block; margin-top: 40px; font-family: var(--mono); font-size: 13.5px; color: var(--accent); text-decoration: none; }
 .all-repos:hover { text-decoration: underline; text-underline-offset: 4px; }
 
@@ -298,6 +300,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; font-fa
   .tile.big { grid-row: auto; min-height: 320px; }
   .par { gap: 24px; }
   .more-grid, .channels { grid-template-columns: 1fr; }
+  .skills.six { grid-template-columns: 1fr 1fr; }
   .numbers { grid-template-columns: 1fr 1fr; }
   .numbers div { padding: 24px 16px 24px 0; }
   .numbers div:nth-child(3) { border-left: 0; padding-left: 0; }
@@ -306,8 +309,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; font-fa
 }
 @media (max-width: 640px) {
   .wrap { padding-inline: 16px; }
-  .nav { gap: 16px; }
-  .nav ul { gap: 16px; }
+  .nav { gap: 14px; }
+  .nav ul { gap: 12px; }
   .nav ul a { font-size: 13px; }
   .m-hide, .nav .gh, .nav .clock { display: none; }
   .tile { padding: 24px; }
@@ -333,6 +336,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; font-fa
     <nav aria-label="Primary">
       <ul>
         <li><a href="#/work">Work</a></li>
+        <li><a href="#/software">Software</a></li>
         <li><a href="#/journey">Journey</a></li>
         <li><a href="#/about">About</a></li>
         <li><a href="#/contact">Contact</a></li>
@@ -353,6 +357,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; font-fa
         <p class="sub">Third-year CS undergrad at PES University, Bangalore. Building Parakaya, a Rust VM that migrates live processes between machines.</p>
         <div class="cta">
           <a class="btn btn-primary" href="#/work">Explore work</a>
+          <a class="btn btn-ghost" href="#/software">Software engineering</a>
           <a class="btn btn-ghost" href="resume.pdf" target="_blank" rel="noopener">Resume PDF</a>
         </div>
       </div>
@@ -368,10 +373,10 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; font-fa
     </div>
 
     <div class="marquee">
-      <p class="sr-only">Focus areas: Rust, process VMs, zero-knowledge crypto, FHIR, robotics.</p>
+      <p class="sr-only">Focus areas: Rust, process VMs, supply-chain security, zero-knowledge crypto, FHIR, robotics.</p>
       <div class="marquee-track" aria-hidden="true">
-        <span>RUST<i>✳</i>PROCESS VMs<i>✳</i>ZERO-KNOWLEDGE CRYPTO<i>✳</i>FHIR<i>✳</i>ROBOTICS<i>✳</i></span>
-        <span>RUST<i>✳</i>PROCESS VMs<i>✳</i>ZERO-KNOWLEDGE CRYPTO<i>✳</i>FHIR<i>✳</i>ROBOTICS<i>✳</i></span>
+        <span>RUST<i>✳</i>PROCESS VMs<i>✳</i>SUPPLY-CHAIN SECURITY<i>✳</i>ZERO-KNOWLEDGE CRYPTO<i>✳</i>FHIR<i>✳</i>ROBOTICS<i>✳</i></span>
+        <span>RUST<i>✳</i>PROCESS VMs<i>✳</i>SUPPLY-CHAIN SECURITY<i>✳</i>ZERO-KNOWLEDGE CRYPTO<i>✳</i>FHIR<i>✳</i>ROBOTICS<i>✳</i></span>
       </div>
     </div>
 
@@ -390,10 +395,10 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; font-fa
             <p>A zero-knowledge password manager: one AES-256-GCM vault, opened by a web app and a native Android client.</p>
             <div class="tags"><span class="tag">Web Crypto</span><span class="tag">Android</span></div>
           </a>
-          <a class="tile reveal" href="#/work/timeline">
-            <h3>Clinical Timeline Builder</h3>
-            <p>Twenty FHIR R4 resources for a diabetic care pathway, rebuilt into a chronological clinical timeline.</p>
-            <div class="tags"><span class="tag">Python</span><span class="tag">FHIR R4</span></div>
+          <a class="tile reveal" href="#/work/capstone">
+            <h3>Supply-Chain Trust Gate</h3>
+            <p>Checks a registry's "fixed in version X" claim against the files PyPI actually shipped, before a pipeline installs the package.</p>
+            <div class="tags"><span class="tag">Python</span><span class="tag">CI/CD security</span></div>
           </a>
         </div>
       </div>
@@ -420,7 +425,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; font-fa
   <section class="view" data-view="work" id="/work" aria-labelledby="h-work">
     <div class="wrap">
       <div class="view-head">
-        <h1 id="h-work" tabindex="-1">Four projects, four different problems.</h1>
+        <h1 id="h-work" tabindex="-1">Five projects, five different problems.</h1>
       </div>
 
       <details class="case" id="case-parakaya" open>
@@ -449,6 +454,22 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; font-fa
         <div class="case-foot">
           <div class="tags"><span class="tag">Rust</span><span class="tag">process VM</span><span class="tag">checkpoint / resume</span></div>
           <a class="repo-link" href="https://github.com/Kishi836/parakaya" target="_blank" rel="noopener">github.com/Kishi836/parakaya</a>
+        </div>
+      </details>
+
+      <details class="case" id="case-capstone">
+        <summary>
+          <h2>Supply-Chain Trust Gate</h2>
+          <span class="role">Capstone, team of four, PES University. I own the PyPI adapter</span>
+          <span class="toggle" aria-hidden="true">+</span>
+        </summary>
+        <div class="par">
+          <div><h3>Problem</h3><p>Build pipelines and AI coding assistants act on what a vulnerability database says, such as "fixed in version X", without checking it against what was actually shipped. When GitHub and PyPA disagree, someone acts on a wrong record.</p></div>
+          <div><h3>Approach</h3><p>Fingerprint the advisory's fix commit, download every PyPI release of the package, and find the first release that really contains the fix. A trust router then answers TRUST, VERIFY, FLAG or ABSTAIN, with the evidence, before anything is installed.</p></div>
+          <div><h3>Result</h3><p>Stage 0, written down before we counted: 820 real cases where GitHub and PyPA name different fixed versions (pass mark 300), 711 with a fix commit we can trace. Phase I runs to November 2026.</p></div>
+        </div>
+        <div class="case-foot">
+          <div class="tags"><span class="tag">Python</span><span class="tag">PyPI</span><span class="tag">GitHub Advisory DB</span><span class="tag">RAG</span><span class="tag">GitHub Actions</span></div>
         </div>
       </details>
 
@@ -528,13 +549,126 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; font-fa
     </div>
   </section>
 
+  <section class="view" data-view="software" id="/software" aria-labelledby="h-software">
+    <div class="wrap">
+      <div class="view-head">
+        <h1 id="h-software" tabindex="-1">Software engineering, end to end.</h1>
+        <p>From requirements to release. I design before I code, test what I ship, automate the pipeline, and work with AI coding agents with every change reviewed.</p>
+        <div class="links" style="margin-top: 28px">
+          <a class="btn btn-primary" href="resume-swe.pdf" target="_blank" rel="noopener">Software resume</a>
+          <a class="btn btn-ghost" href="#/work">Systems work</a>
+        </div>
+      </div>
+
+      <details class="case" id="case-swe-repo6uard" open>
+        <summary>
+          <h2>Repo6uard</h2>
+          <span class="role">Full-stack web app, team of six, CIE Ignite startup program. I built the backend pipeline</span>
+          <span class="toggle" aria-hidden="true">+</span>
+        </summary>
+        <div class="par">
+          <div><h3>Problem</h3><p>Developers need vulnerability findings they can act on before they deploy, not a wall of pattern matches with no context.</p></div>
+          <div><h3>Approach</h3><p>A React 19 and Vite interface over a Flask API with scan, repo-scan and health endpoints. My part was the multi-pass backend: Bandit and njsscan static analysis, an LLM pass that drops false positives and writes fixes, and a live OSV dependency check.</p></div>
+          <div><h3>Result</h3><p>15 issues across 8 OWASP categories on a deliberately vulnerable repo in under 30 seconds. We pitched it through two phases of the startup program and missed the final round by one position.</p></div>
+        </div>
+        <div class="case-foot">
+          <div class="tags"><span class="tag">React</span><span class="tag">Flask REST API</span><span class="tag">LLM</span><span class="tag">OWASP Top 10</span></div>
+          <a class="repo-link" href="https://github.com/Kishi836/repo6uard" target="_blank" rel="noopener">github.com/Kishi836/repo6uard</a>
+        </div>
+      </details>
+
+      <details class="case" id="case-agents">
+        <summary>
+          <h2>Multi-Agent Development Environment</h2>
+          <span class="role">How I write software day to day</span>
+          <span class="toggle" aria-hidden="true">+</span>
+        </summary>
+        <div class="par">
+          <div><h3>Problem</h3><p>Two AI coding agents, Claude Code and Codex, each want their own rules, skills and memory. Keeping two copies in sync drifts, and unreviewed agent output is a liability.</p></div>
+          <div><h3>Approach</h3><p>One shared set of skills, project rules and read/write memory that both agents load, with a written design spec covering parity, permissions and sandboxing. Work runs planner, executor, reviewer: a lead agent writes bounded instructions, sub-agents change only what I approve.</p></div>
+          <div><h3>Result</h3><p>Every task, from coursework to the capstone, runs through one setup. The lead agent verifies each change before it is reported done, so I review evidence, not claims.</p></div>
+        </div>
+        <div class="case-foot">
+          <div class="tags"><span class="tag">Claude Code</span><span class="tag">Codex</span><span class="tag">MCP</span><span class="tag">prompt engineering</span><span class="tag">context management</span></div>
+        </div>
+      </details>
+
+      <details class="case" id="case-study">
+        <summary>
+          <h2>Agentic Study Pipeline</h2>
+          <span class="role">Course material in, knowledge graphs and practice papers out</span>
+          <span class="toggle" aria-hidden="true">+</span>
+        </summary>
+        <div class="par">
+          <div><h3>Problem</h3><p>Slides, notes and question banks for five courses sit behind a university portal, and a downloader that only half works fails silently.</p></div>
+          <div><h3>Approach</h3><p>A sync tool pulls every course's material. A per-subject knowledge graph stores theorems, worked problems and past exam questions as typed nodes, each tagged with its common exam trap. An AI agent retrieves from the graph to write practice papers and run quiz drills.</p></div>
+          <div><h3>Result</h3><p>Found and fixed a bug where only 21 of 62 classes' files were downloading. The Graph Theory graph holds 409 nodes and 543 edges, and a slide-diff check keeps the agent on verified sources.</p></div>
+        </div>
+        <div class="case-foot">
+          <div class="tags"><span class="tag">Python</span><span class="tag">RAG</span><span class="tag">knowledge graphs</span><span class="tag">LLM agents</span></div>
+        </div>
+      </details>
+
+      <details class="case" id="case-meditech">
+        <summary>
+          <h2>Meditech Lab</h2>
+          <span class="role">Healthcare informatics dashboard, Medical Informatics course</span>
+          <span class="toggle" aria-hidden="true">+</span>
+        </summary>
+        <div class="par">
+          <div><h3>Problem</h3><p>Simulate a hospital lab pipeline end to end: register a patient, record results, and emit the standard messages real hospital systems exchange.</p></div>
+          <div><h3>Approach</h3><p>A modular Flask app over PostgreSQL, with a pure domain layer kept apart from HTTP and database wiring so it tests without a database. An HL7 v2.5 message builder written from scratch, running on a five-service Docker Compose stack.</p></div>
+          <div><h3>Result</h3><p>About 3,300 lines of Python across 26 commits and five modules: patient registry, intake, a clinical-note entity extractor, an ICD-10 and SNOMED coder, and a live pipeline view.</p></div>
+        </div>
+        <div class="case-foot">
+          <div class="tags"><span class="tag">Flask</span><span class="tag">PostgreSQL</span><span class="tag">pytest</span><span class="tag">Docker Compose</span><span class="tag">HL7 v2.5</span></div>
+          <a class="repo-link" href="https://github.com/Kishi836/meditech-lab-dashboard" target="_blank" rel="noopener">github.com/Kishi836/meditech-lab-dashboard</a>
+        </div>
+      </details>
+
+      <div class="more">
+        <h2>How I build</h2>
+        <div class="more-grid">
+          <div>
+            <div class="name">Design before code</div>
+            <div class="desc">Parakaya is written spec-first, with a decision record for every architectural call.</div>
+          </div>
+          <div>
+            <div class="name">Test what ships</div>
+            <div class="desc">Meditech's domain layer runs under a database-free pytest suite, and PassGen ships an in-app self-test suite.</div>
+          </div>
+          <div>
+            <div class="name">Automate delivery</div>
+            <div class="desc">GitHub Actions checks format, lint and tests on every Parakaya push, and mirrors advisory data daily for the capstone.</div>
+          </div>
+          <div>
+            <div class="name">AI with review</div>
+            <div class="desc">Agents work from bounded instructions, and nothing is reported done until the change has been verified.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="more">
+        <h2>Toolkit</h2>
+        <div class="skills six">
+          <div><h2>Languages</h2><ul><li>Python, Java</li><li>C, C++, JavaScript</li><li>SQL, Rust</li></ul></div>
+          <div><h2>Web</h2><ul><li>React, Vite</li><li>Flask, REST APIs</li><li>HTML, CSS</li></ul></div>
+          <div><h2>Databases</h2><ul><li>PostgreSQL</li><li>MongoDB</li><li>SQLite</li></ul></div>
+          <div><h2>AI &amp; agents</h2><ul><li>Claude Code, Codex</li><li>RAG, prompt engineering</li><li>MCP tools, LLM APIs</li></ul></div>
+          <div><h2>Engineering practice</h2><ul><li>OOP, data structures</li><li>Agile, Scrum</li><li>Testing, code review</li></ul></div>
+          <div><h2>Delivery</h2><ul><li>Git, GitHub Actions</li><li>Docker Compose</li><li>Linux</li></ul></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="view" data-view="journey" id="/journey" aria-labelledby="h-journey">
     <div class="wrap">
       <div class="view-head">
         <h1 id="h-journey" tabindex="-1">Journey</h1>
       </div>
       <ol class="rail">
-        <li class="reveal"><span class="year">Now</span><p>CS at PES University, with a minor in Medical Innovations and Technology.</p><p class="detail">Electives this semester: AR/VR (OpenGL, Unity, Three.js) and ROS for Autonomous Systems (ROS 2 Humble, Gazebo, Webots).</p></li>
+        <li class="reveal"><span class="year">Now</span><p>CS at PES University, with a minor in Medical Innovations and Technology.</p><p class="detail">Capstone: Supply-Chain Trust Gate. Electives this semester: AR/VR (OpenGL, Unity, Three.js) and Graph Theory.</p></li>
         <li class="reveal"><span class="year">2026</span><p>Completed a two-month IoT and Robotics internship at Tripple One Solutions (Jun-Aug).</p><p class="detail">Embedded firmware, motor control and device-to-cloud connectivity.</p></li>
         <li class="reveal"><span class="year">2026</span><p>Built a heart-disease prediction model at the Epoch Datathon.</p></li>
         <li class="reveal"><span class="year">2022</span><p>Ranked 5th in school, CBSE Class 10 board examinations.</p></li>
@@ -552,7 +686,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; font-fa
       <div class="about">
         <div class="bio reveal">
           <p>I got into computers through robotics: FIRST LEGO League, then representing India at the 2019 International Championship in Sydney. These days the obsession is lower level. I am an Arch Linux and Hyprland person, and I like problems where the OS, the hardware and the network all have opinions.</p>
-          <p>At PES University I study CS with a minor in Medical Innovations and Technology, which is where the FHIR work comes from. Over the summer of 2026 I did a two-month IoT and Robotics internship at Tripple One Solutions, working on embedded firmware, motor control and device-to-cloud connectivity. This semester I picked the two electives closest to the metal: AR/VR (OpenGL, Unity, Three.js) and ROS for Autonomous Systems (ROS 2 Humble, Gazebo, Webots).</p>
+          <p>At PES University I study CS with a minor in Medical Innovations and Technology, which is where the FHIR work comes from. Over the summer of 2026 I did a two-month IoT and Robotics internship at Tripple One Solutions, working on embedded firmware, motor control and device-to-cloud connectivity. My capstone is a supply-chain trust gate that checks vulnerability records against the packages actually shipped, and I am ramping up on Kubernetes, Ansible and AWS next.</p>
           <p>Outside of code: keyboard, music production and cycling.</p>
         </div>
         <div class="skills reveal">
@@ -561,12 +695,12 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; font-fa
             <ul><li>Python, C, C++</li><li>Rust</li><li>Java, JavaScript</li></ul>
           </div>
           <div>
-            <h2>Systems &amp; Robotics</h2>
-            <ul><li>Linux (Arch, Hyprland)</li><li>ROS 2, Gazebo, Webots</li><li>Arduino, Raspberry Pi</li></ul>
+            <h2>Systems &amp; DevOps</h2>
+            <ul><li>Linux (Arch, Hyprland)</li><li>Docker, Git, GitHub Actions</li><li>Arduino, Raspberry Pi</li></ul>
           </div>
           <div>
             <h2>Security</h2>
-            <ul><li>Web Crypto, AES-GCM</li><li>Wireshark</li><li>Bandit, njsscan, OSV</li></ul>
+            <ul><li>Supply-chain security</li><li>Web Crypto, AES-GCM</li><li>Wireshark, Bandit, OSV</li></ul>
           </div>
           <div>
             <h2>Web</h2>
