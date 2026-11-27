@@ -21,7 +21,7 @@ PAGE = ROOT / "index.html"
 SRC = PAGE.read_text(encoding="utf-8")
 URL = PAGE.as_uri()
 CHROME = os.environ.get("CHROME", r"C:\Program Files\Google\Chrome\Application\chrome.exe")
-VIEWS = ["home", "work", "journey", "about", "contact"]
+VIEWS = ["home", "work", "software", "journey", "about", "contact"]
 TMP = Path(tempfile.mkdtemp(prefix="site-check-"))
 atexit.register(shutil.rmtree, TMP, True)
 
@@ -117,7 +117,7 @@ assert list(found) == VIEWS, f"views in markup: {list(found)}"
 assert not any(found.values()), "a view is hidden in the markup, so no-JS visitors lose it"
 for name in VIEWS[1:]:
     assert f'href="#/{name}"' in SRC, f"nothing links to #/{name}"
-for s in ["600k", "&lt;30s", "FLL International", "mailto:gskshitij0638@gmail.com",
+for s in ["600k", "&lt;30s", "FLL Asia Pacific Open", "mailto:gskshitij0638@gmail.com",
           "linkedin.com/in/kshitijgshettigar", "resume.pdf", "github.com/Kishi836/parakaya",
           "github.com/Kishi836/repo6uard", "touch-action: pan-y pinch-zoom", ".js .reveal"]:
     assert s in SRC, f"missing {s!r}"
